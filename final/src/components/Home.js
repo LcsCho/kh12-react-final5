@@ -1,7 +1,9 @@
 import { AiOutlinePlus, AiOutlineUnorderedList } from "react-icons/ai";
+import axios from "axios";
 import { NavLink, useLocation } from "react-router-dom";
 
 const Home = (props) => {
+  
   const location = useLocation();
   const iconStyle = {
     color: "#B33939",
@@ -41,7 +43,7 @@ const Home = (props) => {
                         <IconNavLink icon={<AiOutlinePlus style={iconStyle} />} to="/movieRegister" label="영화 등록" />
                     </div>
                     <div className="col-md-4">
-                        <IconNavLink icon={<AiOutlineUnorderedList style={iconStyle} />} to="/movieList" label="영화 목록" />
+                        <IconNavLink icon={<AiOutlineUnorderedList style={iconStyle} />} to="/movie" label="영화 목록" />
                     </div>
                     <div className="col-md-4">
                         <IconNavLink icon={<AiOutlineUnorderedList style={iconStyle} />} to="/memberList" label="회원 목록" />
