@@ -3,9 +3,9 @@ import Menu from './components/Menu';
 
 import MovieRegister from './components/MovieRegister';
 import Home from './components/Home';
-import MovieList from './components/MovieList';
 import MemberList from './components/MemberList';
 import { NavLink, Routes, Route } from 'react-router-dom';
+import Movie from './components/Movie';
 
 function App() {
  
@@ -21,7 +21,7 @@ function App() {
           <Routes>
             <Route exact path="/" element={<Home />}></Route>
             <Route path="/movieRegister" element={<MovieRegister />}></Route>
-            <Route path="/movieList" element={<MovieList />}></Route>
+            <Route path="/movie" element={<Movie />}></Route>
             <Route path="/memberList" element={<MemberList />}></Route>
           </Routes>
         </div>
