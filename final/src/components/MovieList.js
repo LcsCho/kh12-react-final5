@@ -34,13 +34,13 @@ const MovieList = (props) => {
 
     // 배우 세팅
     const [actors, setActors] = useState({
-        주연: [''],
-        조연: [''],
-        단역: [''],
-        엑스트라: [''],
-        특별출연: [''],
-        우정출연: [''],
-        성우: [''],
+        주연: [],
+        조연: [],
+        단역: [],
+        엑스트라: [],
+        특별출연: [],
+        우정출연: [],
+        성우: [],
     });
     // 섹션 확장 여부를 추적하는 상태
     const [expandedSections, setExpandedSections] = useState({
@@ -58,7 +58,7 @@ const MovieList = (props) => {
         // 배우 상태 업데이트: 새로운 입력 추가
         setActors((prevActors) => ({
             ...prevActors,
-            [type]: [...prevActors[type], ''],
+            [type]: [...prevActors[type], ''], // 이 부분에서 빈 문자열 추가가 아니라 빈 문자열 하나로 대체
         }));
         // 섹션 확장 상태 업데이트: 현재 섹션만 확장되도록 설정
         setExpandedSections((prevExpandedSections) => ({
@@ -67,18 +67,17 @@ const MovieList = (props) => {
         }));
     };
     // 배우 입력 값 변경 함수
-    const handleActorChange = (event, type, index) => {
+    const handleActorChange = (e, type, index) => {
         const updatedActors = { ...actors };
-        updatedActors[type][index] = event.target.value;
+        updatedActors[type][index] = e.target.value;
         setActors(updatedActors);
     };
 
 
-    // 이미지 미리보기 함수
+    // 포스터 미리보기 함수
     const [previewImage, setPreviewImage] = useState(null);
-    const [previewImages, setPreviewImages] = useState(null);
 
-    // 이미지가 선택될 때 호출되는 함수
+    // 포스터가 선택될 때 호출되는 함수
     const handleImageChange = (event) => {
         const selectedFile = event.target.files[0];
 
@@ -91,6 +90,39 @@ const MovieList = (props) => {
             reader.readAsDataURL(selectedFile);
         } else {
             setPreviewImage(null);
+        }
+    };
+
+
+    // 갤러리 이미지 상태
+    const [galleryImages, setGalleryImages] = useState([]);
+
+    // 갤러리 이미지 추가 함수
+    const addGalleryImageInput = () => {
+        setGalleryImages((prevGalleryImages) => [
+            ...prevGalleryImages,
+            { file: null, preview: null },
+        ]);
+    };
+
+    // 갤러리 이미지 변경 함수
+    const handleGalleryImageChange = (event, index) => {
+        const selectedFile = event.target.files[0];
+
+        if (selectedFile) {
+            // 선택된 파일이 있을 경우 미리보기 업데이트
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setGalleryImages((prevGalleryImages) => {
+                    const updatedGalleryImages = [...prevGalleryImages];
+                    updatedGalleryImages[index] = {
+                        file: selectedFile,
+                        preview: reader.result,
+                    };
+                    return updatedGalleryImages;
+                });
+            };
+            reader.readAsDataURL(selectedFile);
         }
     };
     return (
@@ -145,7 +177,6 @@ const MovieList = (props) => {
                                     </td>
                                 </tr>
                             ))}
-
                         </tbody>
                     </table>
                 </div>
@@ -171,15 +202,23 @@ const MovieList = (props) => {
                             {/* 영화 포스터 업로드 및 미리보기 부분 시작 */}
                             <div className="row mt-4">
                                 <div className="col">
-                                    <label className="form-label">영화 포스터</label>
-                                    <input type="file" name="imageNo" className="form-control" onChange={handleImageChange} />
+                                    <label className="form-label">포스터</label>
+                                    <input
+                                        type="file"
+                                        name="imageNo"
+                                        className="form-control"
+                                        onChange={handleImageChange}
+                                    />
+                                    {previewImage && (
+                                        <div className="mt-2">
+                                            <img
+                                                src={previewImage}
+                                                alt="미리보기"
+                                                className="img-fluid"
+                                            />
+                                        </div>
+                                    )}
                                 </div>
-                                {previewImage && (
-                                    <div className="col">
-                                        <label className="form-label">미리보기</label>
-                                        <img src={previewImage} alt="미리보기" className="img-fluid" />
-                                    </div>
-                                )}
                             </div>
                             {/* 이미지 업로드 및 미리보기 부분 끝 */}
 
@@ -255,29 +294,47 @@ const MovieList = (props) => {
                                                     />
                                                 </div>
                                             ))}
-                                        <button
-                                            className="btn btn-secondary"
-                                            onClick={() => addActorInput(type)}
-                                        >
-                                            추가
-                                        </button>
+                                        <div>
+                                            <button
+                                                className="btn btn-secondary"
+                                                onClick={() => addActorInput(type)}>
+                                                추가
+                                            </button>
+                                        </div>
                                     </div>
                                 ))}
                             </div>
 
-                            {/* 갤러리 */}
+                            {/* 갤러리 이미지 부분 시작 */}
                             <div className="row mt-4">
-                                <div className="col">
-                                    <label className="form-label">갤러리</label>
-                                    <input type="file" name="attachNo" className="form-control" onChange={handleImageChange} />
-                                </div>
-                                {previewImage && (
-                                    <div className="col">
-                                        <label className="form-label">미리보기</label>
-                                        <img src={previewImages} alt="미리보기" className="img-fluid" />
+                                {galleryImages.map((galleryImage, index) => (
+                                    <div key={index} className="col-4">
+                                        <label className="form-label">갤러리 이미지</label>
+                                        <input
+                                            type="file"
+                                            name={`galleryImage${index}`}
+                                            className="form-control"
+                                            onChange={(e) => handleGalleryImageChange(e, index)}
+                                        />
+                                        {galleryImage.preview && (
+                                            <img
+                                                src={galleryImage.preview}
+                                                alt={`미리보기 ${index + 1}`}
+                                                className="img-fluid mt-2"
+                                            />
+                                        )}
                                     </div>
-                                )}
+                                ))}
+                                <div className="col-4">
+                                    <button
+                                        className="btn btn-secondary"
+                                        onClick={addGalleryImageInput}
+                                    >
+                                        갤러리 이미지 추가
+                                    </button>
+                                </div>
                             </div>
+                            {/* 갤러리 이미지 부분 끝 */}
                         </div>
                         <div className="modal-footer">
                             <div className="modal-footer">
