@@ -47,8 +47,8 @@ const Home = (props) => {
     opacity: "100%",
   };
   const navLinkStyle = {
-    backgroundColor: "#B33939",
-    opacity: "30%",
+    border: '2px solid #B33939',
+    opacity: "100%"
   };
   const spanStyle = {
     color: "black",
@@ -78,7 +78,7 @@ const Home = (props) => {
         <div style={{ border: '2px solid #B33939', borderRadius: '5px', marginTop: '20px', marginBottom: '20px', width: "100%", height: "400px" }} className="p-4">
           <h1>관리자</h1>
           <hr />
-          <div className="row">
+          <div className="row text-center">
             <div className="col-md-4">
               <IconNavLink icon={<AiOutlineUnorderedList style={iconStyle} />} to="/actorList" label="배우 목록" />
             </div>
@@ -90,17 +90,17 @@ const Home = (props) => {
             </div>
           </div>
           <hr />
-          <div className="row">
+          <div className="row text-center">
             <div className="col-md-4">
-              <p>회원 수</p>
+              <p >[회원 수]</p>
               <span>{memberCount}</span>
             </div>
             <div className="col-md-4">
-              <p>영화 개수</p>
+              <p>[영화 개수]</p>
               <span>{movieCount}</span>
             </div>
             <div className="col-md-4">
-              <p>평점 수</p>
+              <p>[평점 수]</p>
               <span>{ratingCount}</span>
             </div>
           </div>
