@@ -2,6 +2,7 @@ import { AiOutlinePlus, AiOutlineUnorderedList } from "react-icons/ai";
 import { useState, useRef, useEffect } from "react";
 import axios from "axios";
 import { NavLink, useLocation } from "react-router-dom";
+import { Modal } from "bootstrap";
 
 const Home = (props) => {
 
@@ -68,6 +69,9 @@ const Home = (props) => {
     );
   };
 
+
+
+
   return (
     <div style={{ marginTop: '100px', marginBottom: '100px' }}>
       <div className="col-md-10 offset-md-1 col-sm-10 offset-sm-1 mt-5">
@@ -76,7 +80,7 @@ const Home = (props) => {
           <hr />
           <div className="row">
             <div className="col-md-4">
-              <IconNavLink icon={<AiOutlinePlus style={iconStyle} />} to="/movieRegister" label="영화 등록" />
+              <IconNavLink icon={<AiOutlineUnorderedList style={iconStyle} />} to="/actorList" label="배우 목록" />
             </div>
             <div className="col-md-4">
               <IconNavLink icon={<AiOutlineUnorderedList style={iconStyle} />} to="/movieList" label="영화 목록" />
