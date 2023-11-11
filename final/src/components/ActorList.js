@@ -91,7 +91,6 @@ const ActorList = (props) => {
             actorImage: null,
         });
         setPreviewImage(null);       
-
     };
 
     const changeActor =(e)=>{
