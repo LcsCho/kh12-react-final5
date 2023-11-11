@@ -7,9 +7,10 @@ import { NavLink, useLocation } from "react-router-dom";
 import { MdOutlineClear } from "react-icons/md";
 
 const MemberList = (props) => {
-
     const location = useLocation();
     const [memberList, setMemberList] = useState([]);
+    const [editableMemberId, setEditableMemberId] = useState(null);
+    const [editedMemberLevel, setEditedMemberLevel] = useState('');
 
     const loadMember = async () => {
         const response = await axios({
@@ -19,40 +20,96 @@ const MemberList = (props) => {
         setMemberList(response.data);
     };
 
+    const [originalMemberLevel, setOriginalMemberLevel] = useState('');
+
+    const handleEditClick = (memberId, memberLevel) => {
+        setEditableMemberId(memberId);
+        setEditedMemberLevel(memberLevel);
+        setOriginalMemberLevel(memberLevel);
+    };
+
+    const handleCancelClick = () => {
+        setEditableMemberId(null);
+        setEditedMemberLevel('');
+        setOriginalMemberLevel('');
+    };
+
+    const handleLevelChange = (e) => {
+        setEditedMemberLevel(e.target.value);
+    };
+
+    const updateMember = async (memberId) => {
+        try {
+            await axios({
+                url: `${process.env.REACT_APP_REST_API_URL}/member/${memberId}`,
+                method: "patch",
+                data: {
+                    memberLevel: editedMemberLevel
+                }
+            });
+            setEditableMemberId(null);
+            setEditedMemberLevel('');
+            setOriginalMemberLevel('');
+            loadMember();
+        } catch (error) {
+            console.error("Error updating member level:", error);
+        }
+    };
+
     useEffect(() => {
         loadMember();
     }, []);
+
     return (
         <>
             <h3 style={{ color: '#B33939', marginTop: '50px', marginBottom: '50px' }}>회원 목록</h3>
 
-            <div className="row mt-4" >
-
-
-
+            <div className="row mt-4">
                 <div className="col text-center">
                     <table className="table">
                         <thead>
                             <tr>
                                 <th width="30%">아이디</th>
-                                <th width="20%">닉네임</th>
+                                <th width="15%">닉네임</th>
                                 <th width="15%">연락처</th>
                                 <th width="15%">생년월일</th>
                                 <th width="10%">가입일</th>
                                 <th width="5%">성별</th>
-                                <th width="5%">등급</th>
+                                <th width="10%">등급</th>
                             </tr>
                         </thead>
                         <tbody>
                             {memberList.map((member, index) => (
-                                <tr>
+                                <tr key={index}>
                                     <td>{member.memberId}</td>
                                     <td>{member.memberNickname}</td>
                                     <td>{member.memberContact}</td>
                                     <td>{member.memberBirth}</td>
                                     <td>{member.memberJoin}</td>
                                     <td>{member.memberGender}</td>
-                                    <td>{member.memberLevel}</td>
+                                    <td>
+                                        <div className="row">
+                                            {editableMemberId === member.memberId ? (
+                                                <div className="row">
+                                                    <select
+                                                        value={editedMemberLevel}
+                                                        onChange={handleLevelChange}
+                                                    >
+                                                        <option value="일반">일반</option>
+                                                        <option value="평론가">평론가</option>
+                                                        <option value="관리자">관리자</option>
+                                                    </select>
+                                                        <button className="btn btn-success" onClick={() => updateMember(member.memberId)}>수정</button>
+                                                        <button className="btn btn-secondary" onClick={handleCancelClick}>취소</button>
+                                                </div>
+                                            ) : (
+                                                <>
+                                                    <button className="btn btn-danger" onClick={() => handleEditClick(member.memberId, member.memberLevel)}>{member.memberLevel}
+                                                    </button>
+                                                </>
+                                            )}
+                                        </div>
+                                    </td>
                                 </tr>
                             ))}
                         </tbody>
