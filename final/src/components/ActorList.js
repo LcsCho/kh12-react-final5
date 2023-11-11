@@ -7,35 +7,60 @@ import { NavLink, useLocation } from "react-router-dom";
 import { MdOutlineClear } from "react-icons/md";
 
 const ActorList = (props) => {
-    const location = useLocation();
-    const [actorList, setActorList] = useState([]);
-    const [actorImageListByActorNo, setActorImageListByActorNo] = useState([]);
+    const[actorList,setActorList] =useState([]);
 
     const loadActor = async () => {
         try {
             const response = await axios({
                 url: `${process.env.REACT_APP_REST_API_URL}/actor/`,
-                method: "get"
+                method: "get",
             });
-            setActorList(response.data);
-
-            // Load images for each actor
-            const actorImages = await Promise.all(
-                response.data.map(async (actor) => {
-                    const imageResponse = await axios({
-                        url: `${process.env.REACT_APP_REST_API_URL}/image/93`,
-                        method: "get",
-                    });
-                    return {
-                        actorNo: actor.actorNo,
-                        imageData: imageResponse.data,
-                    };
-                })
-            );
-            setActorImageListByActorNo(actorImages);
+            
+            // 각 배우에 대한 이미지를 불러오고 actorList를 업데이트
+            const updatedActorList = await Promise.all(response.data.map(async (actor) => {
+                const imageUrl = await loadActorImage(actor.actorNo);
+                return { ...actor, imageUrl };
+            }));
+    
+            setActorList(updatedActorList);
         } catch (error) {
-            console.error("배우 이미지를 불러올 수 없습니다.", error);
+            console.error("오류남", error);
         }
+    };
+    const loadActorImage = async (actorNo) => {
+        try {
+            const imageResponse = await axios({
+                url: `${process.env.REACT_APP_REST_API_URL}/image/actor/${actorNo}`,
+                method: "get",
+                responseType: "arraybuffer", // 이 부분은 이미지 데이터를 바이너리 형식으로 받기 위한 설정입니다.
+            });
+    
+            // 이미지 데이터를 Blob으로 변환
+            const blob = new Blob([imageResponse.data], { type: imageResponse.headers['content-type'] });
+    
+            // Blob을 URL로 변환
+            const imageUrl = URL.createObjectURL(blob);
+    
+            return imageUrl;
+        } catch (error) {
+            console.error("Failed to load actor image:", error);
+            return null;
+        }
+    };
+
+    useEffect(()=>{
+        loadActor();
+    },[]);
+    // 모달 세팅
+    const bsModal = useRef();
+    const openModal = () => {
+        const modal = new Modal(bsModal.current);
+        modal.show();
+    };  
+    const closeModal = () => {
+        const modal = Modal.getInstance(bsModal.current);
+        modal.hide();
+        clearActor();
     };
 
     const deleteActor = (actor) => {
@@ -52,57 +77,95 @@ const ActorList = (props) => {
             .catch(err => { });
     };
 
-    useEffect(() => {
-        loadActor();
-    }, []);
+    const [actor,setActor] = useState({
+        //모달에서 입력했을 때  값을 받을 부분
+        actorName: "",
+        actorImage: null, // 파일 선택을 위한 상태
 
-    useEffect(() => {
-        loadActor();
-    }, []);
+    });
 
-    // 모달 세팅
-    const bsModal = useRef();
-    const openModal = () => {
-        const modal = new Modal(bsModal.current);
-        modal.show();
-    };
-    const closeModal = () => {
-        const modal = Modal.getInstance(bsModal.current);
-        modal.hide();
+    const clearActor =()=>{
+        // actor 상태 초기화
+        setActor({
+            actorName: "",
+            actorImage: null,
+        });        
+
     };
 
-    // 등록
-    const [actor, setActor] = useState({ actorNo: "", actorName: "", imageNo: "" })
+    const changeActor =(e)=>{
+        setActor({
+            ...actor,
+            [e.target.name]: e.target.value,
+        });
+    }
 
-    // 배우 미리보기 함수
-    const [previewImage, setPreviewImage] = useState(null);
+    const saveActor = async () => {
+        try {
+            // FormData 객체 생성
+            const formData = new FormData();
+            formData.append("actorName", actor.actorName);
+            formData.append("actorImage", actor.actorImage);
 
-    // 이미지가 선택될 때 호출되는 함수
-    const handleImageChange = (event) => {
-        const selectedFile = event.target.files[0];
+            // actor 정보와 이미지를 함께 서버로 전송
+            const response = await axios.post(
+                `${process.env.REACT_APP_REST_API_URL}/actor/`,
+                formData,
+                {
+                    headers: {
+                        "Content-Type": "multipart/form-data",
+                    },
+                }
+            );
 
-        if (selectedFile) {
-            // 선택된 파일이 있을 경우 미리보기 업데이트
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                setPreviewImage(reader.result);
-            };
-            reader.readAsDataURL(selectedFile);
-        } else {
-            setPreviewImage(null);
+            // 등록 후 목록을 다시 불러오기
+            loadActor();
+            closeModal(); // 모달 닫기
+
+
+        } catch (error) {
+            console.error("Failed to save actor:", error);
         }
     };
+    
 
+        // 배우 미리보기 함수
+        const [previewImage, setPreviewImage] = useState(null);
+
+        // 이미지가 선택될 때 호출되는 함수
+        const handleImageChange = (event) => {
+            const selectedFile = event.target.files[0];
+    
+            if (selectedFile) {
+
+            // 선택된 파일이 있을 경우 파일 정보를 저장
+            setActor({
+                ...actor,
+                actorImage: selectedFile,
+            });                
+                // 선택된 파일이 있을 경우 미리보기 업데이트
+                const reader = new FileReader();
+                reader.onloadend = () => {
+                    setPreviewImage(reader.result);
+                };
+                reader.readAsDataURL(selectedFile);
+            } else {
+                setActor({
+                    ...actor,
+                    actorImage: null,
+                });                
+                setPreviewImage(null);
+            }
+        };
 
     return (
         <>
             <h3 style={{ color: '#B33939', marginTop: '50px', marginBottom: '50px' }}>배우 목록</h3>
             <div className="text-end">
-
-                <button className="btn btn-danger" onClick={openModal}>
+            <button className="btn btn-danger" onClick={openModal}>
                     <AiOutlineUnorderedList />배우 등록
-                </button>
-            </div>
+                </button> 
+            </div>        
 
             <div className="row mt-4" >
 
@@ -125,14 +188,11 @@ const ActorList = (props) => {
                                     <td>{actor.actorNo}</td>
                                     <td>{actor.actorName}</td>
                                     <td>
-                                        {actorImageListByActorNo.find(
-                                            (item) => item.actorNo === actor.actorNo
-                                        ) ? (
+                                        {actor.imageUrl ? (
                                             <img
-                                                src={`data:image/png;base64,${actorImageListByActorNo.find(
-                                                    (item) => item.actorNo === actor.actorNo
-                                                ).imageData}`}
-                                                className="img-fluid"
+                                                src={actor.imageUrl}
+                                                alt={`이미지-${actor.actorNo}`}
+                                                style={{ maxWidth: "100px", maxHeight: "100px" }}
                                             />
                                         ) : (
                                             "이미지 없음"
@@ -166,14 +226,14 @@ const ActorList = (props) => {
                     <div className="modal-content">
                         <div className="modal-header">
                             <h5 className="modal-title" >배우 등록</h5>
-                            {/* <button type="button" className="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button> */}
                         </div>
                         <div className="modal-body">
                             <div className="row"><div className="col">
                                 <label className="form-label">이름</label>
-                                <input type="text" name="actorName" className="form-control" />
+                                <input type="text" name="actorName" className="form-control" 
+                                        value={actor.actorName}
+                                        onChange={changeActor}
+                                        />
                             </div></div>
 
                             {/* 배우 이미지 업로드 및 미리보기 부분 시작 */}
@@ -182,7 +242,7 @@ const ActorList = (props) => {
                                     <label className="form-label">이미지</label>
                                     <input
                                         type="file"
-                                        name="imageNo"
+                                        name="actorImage"
                                         className="form-control"
                                         onChange={handleImageChange}
                                     />
@@ -207,7 +267,7 @@ const ActorList = (props) => {
                                     닫기
                                 </button>
                                 {/* {actor.actorNo === undefined && */}
-                                <button className="btn btn-success">
+                                <button className="btn btn-success" onClick={saveActor}>
                                     저장
                                 </button>
                                 {/* } */}
@@ -215,7 +275,7 @@ const ActorList = (props) => {
                         </div>
                     </div>
                 </div>
-            </div>
+            </div>              
         </>
     );
 };
