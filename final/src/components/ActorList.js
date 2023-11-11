@@ -34,33 +34,41 @@ const ActorList = (props) => {
         try {
             const response = await axios({
                 url: `${process.env.REACT_APP_REST_API_URL}/actor/`,
-                method: "get"
+                method: "get",
             });
-            setActorList(response.data);
 
-            // Load images for each actor
-            const actorImages = await Promise.all(
-                response.data.map(async (actor) => {
-                    const imageResponse = await axios({
-                        url: `${process.env.REACT_APP_REST_API_URL}/image/${actor.actorNo}`,
-                        method: "get",
-                    });
-                    return {
-                        actorNo: actor.actorNo,
-                        imageData: imageResponse.data
-                    };
+            // 각 배우에 대한 이미지를 불러오고 actorList를 업데이트
+            const updatedActorList = await Promise.all(response.data.map(async (actor) => {
+                const imageUrl = await loadActorImage(actor.actorNo);
+                return { ...actor, imageUrl };
+            }));
 
-                })
-
-            );
-            console.log(actorImages);
-            setActorImageListByActorNo(actorImages);
+            setActorList(updatedActorList);
         } catch (error) {
-            console.error("배우 이미지를 불러올 수 없습니다.", error);
+            console.error("이미지 불러오기 불가능 에러", error);
         }
-
-
     };
+    const loadActorImage = async (actorNo) => {
+        try {
+            const imageResponse = await axios({
+                url: `${process.env.REACT_APP_REST_API_URL}/image/actor/${actorNo}`,
+                method: "get",
+                responseType: "arraybuffer", // 이 부분은 이미지 데이터를 바이너리 형식으로 받기 위한 설정입니다.
+            });
+
+            // 이미지 데이터를 Blob으로 변환
+            const blob = new Blob([imageResponse.data], { type: imageResponse.headers['content-type'] });
+
+            // Blob을 URL로 변환
+            const imageUrl = URL.createObjectURL(blob);
+
+            return imageUrl;
+        } catch (error) {
+            console.error("Failed to load actor image:", error);
+            return null;
+        }
+    };
+
 
 
     const deleteActor = (actor) => {
@@ -185,16 +193,11 @@ const ActorList = (props) => {
                                     <td>{actor.actorNo}</td>
                                     <td>{actor.actorName}</td>
                                     <td>
-                                        {actorImageListByActorNo.find(
-                                            (item) => item.actorNo === actor.actorNo
-                                        ) ? (
+                                        {actor.imageUrl ? (
                                             <img
-                                                src={`data:${actorImageListByActorNo.find(
-                                                    (item) => item.actorNo === actor.actorNo
-                                                ).imageData.contentType};base64,${actorImageListByActorNo.find(
-                                                    (item) => item.actorNo === actor.actorNo
-                                                ).imageData.data}`}
-                                                className="img-fluid"
+                                                src={actor.imageUrl}
+                                                alt={`이미지-${actor.actorNo}`}
+                                                style={{ maxWidth: "100px", maxHeight: "100px" }}
                                             />
                                         ) : (
                                             "이미지 없음"
