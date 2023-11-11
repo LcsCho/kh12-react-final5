@@ -89,7 +89,8 @@ const ActorList = (props) => {
         setActor({
             actorName: "",
             actorImage: null,
-        });        
+        });
+        setPreviewImage(null);       
 
     };
 
