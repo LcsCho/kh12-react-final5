@@ -8,6 +8,8 @@ import { MdOutlineClear } from "react-icons/md";
 const MovieList = (props) => {
     const location = useLocation();
     const [movieList, setMovieList] = useState([]);
+    const [genreList, setGenreList] = useState([]);
+
 
     const loadMovie = async () => {
         const response = await axios({
@@ -17,8 +19,27 @@ const MovieList = (props) => {
         setMovieList(response.data);
     };
 
+
+
+    // 장르 불러오기
+    const loadGenre = async () => {
+        const response = await axios({
+            url: `${process.env.REACT_APP_REST_API_URL}/genre/`,
+            method: "get"
+        });
+        setGenreList(response.data);
+    }
+
+
+    const loadMovieDetail = async () => {
+        const response = await axios({
+
+        });
+    };
+
     useEffect(() => {
         loadMovie();
+        loadGenre();
     }, []);
 
     // 모달 세팅
@@ -30,6 +51,18 @@ const MovieList = (props) => {
     const closeModal = () => {
         const modal = Modal.getInstance(bsModal.current);
         modal.hide();
+    };
+
+    // 장르 세팅
+    const [genres, setGenres] = useState([{ genreName: '' }]);
+
+    // 장르 입력 추가 함수
+    const addGenreInput = () => {
+        if (genres.length === 0) {
+            setGenres([{ genreName: '' }]);
+        } else {
+            setGenres((prevGenres) => [...prevGenres, { genreName: '' }]);
+        }
     };
 
     // 배우 세팅
@@ -253,25 +286,30 @@ const MovieList = (props) => {
                                 <input type="number" name="bookPageCount" className="form-control" />
                             </div></div>
 
-                            <div className="row mt-4"><div className="col">
+                            <div className="row mt-4">
                                 <label className="form-label">장르</label>
-                                <select name="genreName" className="form-select">
-                                    <option value="">선택하세요</option>
-                                    <option>로맨스 코미디</option>
-                                    <option>코미디</option>
-                                    <option>추리/미스터리</option>
-                                    <option>액션</option>
-                                    <option>SF</option>
-                                    <option>판타지</option>
-                                    <option>애니메이션</option>
-                                    <option>범죄/공포/스릴러</option>
-                                    <option>음악/뮤지컬</option>
-                                    <option>드라마/다큐멘터리</option>
-                                    <option>전쟁</option>
-                                    <option>사극</option>
-                                    <option>스포츠</option>
-                                </select>
-                            </div></div>
+                                {genres.map((genre, index) => (
+                                    <div key={index} className="col-4">
+
+                                        <select name="genreName" className="form-select">
+                                            <option value="">선택하세요</option>
+                                            {genreList.map((genre, index) => (
+                                                <option key={index} value={genre.genreName}>
+                                                    {genre.genreName}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                ))}
+                                <div className="col">
+                                    <button
+                                        className="btn btn-secondary"
+                                        onClick={addGenreInput}
+                                    >
+                                        추가
+                                    </button>
+                                </div>
+                            </div>
 
                             <div className="row mt-4"><div className="col">
                                 <label className="form-label">줄거리</label>
