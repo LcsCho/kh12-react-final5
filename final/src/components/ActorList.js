@@ -7,7 +7,10 @@ import { NavLink, useLocation } from "react-router-dom";
 import { MdOutlineClear } from "react-icons/md";
 
 const ActorList = (props) => {
+
     const[actorList,setActorList] =useState([]);
+
+    const fileChooser = useRef();
 
     const loadActor = async () => {
         try {
@@ -61,6 +64,7 @@ const ActorList = (props) => {
         const modal = Modal.getInstance(bsModal.current);
         modal.hide();
         clearActor();
+        // clearActorImage();
     };
 
     const deleteActor = (actor) => {
@@ -90,6 +94,7 @@ const ActorList = (props) => {
             actorName: "",
             actorImage: null,
         });
+        fileChooser.current.value = "";//실제 태그 초기화
         setPreviewImage(null);       
     };
 
@@ -100,6 +105,15 @@ const ActorList = (props) => {
         });
     }
 
+    // const clearActorImage = ()=>{
+    //     setActor({
+    //         actorName: "",
+    //         actorImage: null,
+    //     });
+    //     fileChooser.current.value = "";//실제 태그 초기화
+    //     setPreviewImage(null);
+    // };
+
     const saveActor = async () => {
         try {
             // FormData 객체 생성
@@ -109,7 +123,7 @@ const ActorList = (props) => {
 
             // actor 정보와 이미지를 함께 서버로 전송
             const response = await axios.post(
-                `${process.env.REACT_APP_REST_API_URL}/actor/`,
+                `${process.env.REACT_APP_REST_API_URL}/actor/upload`,
                 formData,
                 {
                     headers: {
@@ -135,7 +149,7 @@ const ActorList = (props) => {
         // 이미지가 선택될 때 호출되는 함수
         const handleImageChange = (event) => {
             const selectedFile = event.target.files[0];
-    
+            
             if (selectedFile) {
 
             // 선택된 파일이 있을 경우 파일 정보를 저장
@@ -153,8 +167,95 @@ const ActorList = (props) => {
                 setActor({
                     ...actor,
                     actorImage: null,
-                });                
+                    
+                });
+                fileChooser.current.value = "";//실제 태그 초기화                
                 setPreviewImage(null);
+            }
+        };
+
+        //수정
+
+        const editActor = async (target) => {
+            // 배우 정보를 모달에 표시하기 전에 불러오기
+            const { actorNo } = target;
+            console.log(actor.actorNo);
+
+            // actorNo를 사용하여 배우 정보와 이미지 정보를 불러오기
+            // 해당 정보를 state에 업데이트하고 모달 열기
+            loadActorDetails(actorNo);
+            openModal();
+        };
+        const loadActorDetails = async (actorNo) => {
+            try {
+                // 배우 정보를 불러오는 API 호출
+                const actorResponse = await axios({
+                    url: `${process.env.REACT_APP_REST_API_URL}/actor/findByActorNo/${actorNo}`,
+                    method: "get",
+                });
+
+                console.log("Actor Response:", actorResponse.data);
+
+                // 비어있을 경우 처리
+                if (!actorResponse.data || actorResponse.data.length === 0) {
+                    console.error("비어있어요");
+                    // 원하는 처리를 여기에 추가 (예: 에러 메시지 표시 등)
+                    return;
+                }
+
+        
+                // 이미지 정보를 불러오는 API 호출
+                const imageResponse = await axios({
+                    url: `${process.env.REACT_APP_REST_API_URL}/image/actor/${actorNo}`,
+                    method: "get",
+                    responseType: "arraybuffer",
+                });
+        
+                // 배우 정보와 이미지 정보를 state에 업데이트
+                setActor({
+                    actorNo: actorResponse.data.actorNo,
+                    actorName: actorResponse.data.actorName,
+                    actorImage: new Blob([imageResponse.data], { type: imageResponse.headers['content-type'] }),
+                });
+        
+                // 불러온 이미지를 미리보기로 업데이트
+                setPreviewImage(URL.createObjectURL(new Blob([imageResponse.data], { type: imageResponse.headers['content-type'] })));
+        
+            } catch (error) {
+                console.error("Failed to load actor details:", error);
+            }
+        };
+
+        //수정 비동기
+        const updateActor = async () => {
+            try {
+                // FormData 객체 생성
+                const formData = new FormData();
+                formData.append("actorName", actor.actorName);
+                console.log(actor.actorName);
+        
+                // actor 이미지가 변경된 경우에만 FormData에 추가
+                if (actor.actorImage) {
+                    formData.append("actorImage", actor.actorImage);
+                    console.log(actor.actorImage);
+                }
+        
+                // actor 정보와 이미지를 함께 서버로 전송
+                const response = await axios.put(
+                    `${process.env.REACT_APP_REST_API_URL}/actor/editActor/${actor.actorNo}`,
+                    formData,
+                    {
+                        headers: {
+                            "Content-Type": "multipart/form-data",
+                        },
+                    }
+                );
+        
+                // 수정 후 목록을 다시 불러오기
+                loadActor();
+                closeModal(); // 모달 닫기
+            } catch (error) {
+                console.error("실패", error);
             }
         };
 
@@ -201,7 +302,9 @@ const ActorList = (props) => {
                                     <td>
                                         <div className="d-flex container-fluid">
                                             <div style={{ fontSize: "25px" }}>
-                                                <LiaEdit className="text-warning" />
+                                                <LiaEdit className="text-warning" 
+                                                    onClick={(e) => editActor(actor)}
+                                                />
                                             </div>
                                             <div>
                                                 <MdOutlineClear
@@ -245,6 +348,7 @@ const ActorList = (props) => {
                                         name="actorImage"
                                         className="form-control"
                                         onChange={handleImageChange}
+                                        ref={fileChooser}
                                     />
                                     {previewImage && (
                                         <div className="mt-2">
@@ -266,11 +370,15 @@ const ActorList = (props) => {
                                 <button className="btn btn-secondary" onClick={closeModal}>
                                     닫기
                                 </button>
-                                {/* {actor.actorNo === undefined && */}
+                                {actor.actorNo === undefined ?
                                 <button className="btn btn-success" onClick={saveActor}>
                                     저장
                                 </button>
-                                {/* } */}
+                                :
+                                <button className="btn btn-success" onClick={updateActor}>
+                                    수정
+                                </button>
+                                }
                             </div>
                         </div>
                     </div>
