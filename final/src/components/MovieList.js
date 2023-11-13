@@ -9,14 +9,100 @@ const MovieList = (props) => {
     const location = useLocation();
     const [movieList, setMovieList] = useState([]);
     const [genreList, setGenreList] = useState([]);
+    const [movie, setMovie] = useState({
+        movieImage: null,
+        movieImageList: null,
+        movieName: "",
+        movieDirector: "",
+        movieReleaseDate: "",
+        movieTime: "",
+        movieLevel: "",
+        movieNation: "",
+        movieContent: "",
+        genreNameList: "",
+        actorNoList: "",
+        actorRoleList: "",
+    });
 
 
     const loadMovie = async () => {
         const response = await axios({
             url: `${process.env.REACT_APP_REST_API_URL}/movie/adminMovieList`,
-            method: "get"
+            method: "get",
         });
         setMovieList(response.data);
+    };
+
+
+    const changeMovie = (e) => {
+        setMovie({
+            ...movie,
+            [e.target.name]: e.target.value,
+        });
+    };
+    const clearMovie = () => {
+        setMovie({
+            movieImage: null,
+            movieImageList: null,
+            movieName: "",
+            movieDirector: "",
+            movieReleaseDate: "",
+            movieTime: "",
+            movieLevel: "",
+            movieNation: "",
+            movieContent: "",
+            genreNameList: "",
+            actorNoList: "",
+            actorRoleList: ""
+        });
+    };
+
+    // 영화 삭제
+    const deleteMovie = (movie) => {
+        const choice = window.confirm("정말 삭제하시겠습니까?");
+        if (choice === false) return;
+
+        axios({
+            url: `${process.env.REACT_APP_REST_API_URL}/movie/${movie.movieNo}`,
+            method: "delete",
+        })
+            .then((response) => {
+                loadMovie();
+            })
+            .catch((err) => { });
+    };
+
+    // 영화 등록
+    const saveMovie = async () => {
+        try {
+            const formData = new FormData();
+            formData.append("movieName", movie.movieName);
+            formData.append("movieImage", movie.movieImage);
+            formData.append("movieImageList", movie.movieImageList);
+            formData.append("movieDirector", movie.movieDirector);
+            formData.append("movieReleaseDate", movie.movieReleaseDate);
+            formData.append("movieTime", movie.movieTime);
+            formData.append("movieLevel", movie.movieLevel);
+            formData.append("movieNation", movie.movieNation);
+            formData.append("movieContent", movie.movieContent);
+            formData.append("genreNameList", movie.genreNameList);
+            formData.append("actorNoList", movie.actorNoList);
+            formData.append("actorRoleList", movie.actorRoleList);
+
+            // 영화 모든 것 등록
+            const response = await axios.post(
+                `${process.env.REACT_APP_REST_API_URL}/movie/upload/`,
+                formData,
+                {
+                    headers: {
+                        "Content-Type": "multipart/form-data",
+                    },
+                }
+            );
+            closeModal();
+        } catch (error) {
+            console.error("에러 발생", error);
+        }
     };
 
 
@@ -51,18 +137,18 @@ const MovieList = (props) => {
     const closeModal = () => {
         const modal = Modal.getInstance(bsModal.current);
         modal.hide();
+        clearMovie();
     };
 
     // 장르 세팅
     const [genres, setGenres] = useState([{ genreName: '' }]);
 
-    // 장르 입력 추가 함수
+
     const addGenreInput = () => {
-        if (genres.length === 0) {
-            setGenres([{ genreName: '' }]);
-        } else {
-            setGenres((prevGenres) => [...prevGenres, { genreName: '' }]);
-        }
+        setGenres((prevGenres) => [
+            ...prevGenres,
+            { genreName: '' },
+        ]);
     };
 
     // 배우 세팅
@@ -91,7 +177,7 @@ const MovieList = (props) => {
         // 배우 상태 업데이트: 새로운 입력 추가
         setActors((prevActors) => ({
             ...prevActors,
-            [type]: [...prevActors[type], ''], // 이 부분에서 빈 문자열 추가가 아니라 빈 문자열 하나로 대체
+            [type]: [...prevActors[type], ''],
         }));
         // 섹션 확장 상태 업데이트: 현재 섹션만 확장되도록 설정
         setExpandedSections((prevExpandedSections) => ({
@@ -119,10 +205,18 @@ const MovieList = (props) => {
             const reader = new FileReader();
             reader.onloadend = () => {
                 setPreviewImage(reader.result);
+                setMovie((prevMovie) => ({
+                    ...prevMovie,
+                    movieImage: selectedFile,
+                }));
             };
             reader.readAsDataURL(selectedFile);
         } else {
             setPreviewImage(null);
+            setMovie((prevMovie) => ({
+                ...prevMovie,
+                movieImage: null,
+            }));
         }
     };
 
@@ -137,7 +231,6 @@ const MovieList = (props) => {
             { file: null, preview: null },
         ]);
     };
-
     // 갤러리 이미지 변경 함수
     const handleGalleryImageChange = (event, index) => {
         const selectedFile = event.target.files[0];
@@ -204,7 +297,7 @@ const MovieList = (props) => {
                                                     to="/reviewList">리뷰</NavLink>
                                             </div>
                                             <div>
-                                                <MdOutlineClear className="text-danger" style={{ fontSize: '1.5em' }} />
+                                                <MdOutlineClear className="text-danger" style={{ fontSize: '1.5em' }} onClick={(e) => deleteMovie(movie)} />
                                             </div>
                                         </div>
                                     </td>
@@ -229,7 +322,10 @@ const MovieList = (props) => {
                         <div className="modal-body">
                             <div className="row"><div className="col">
                                 <label className="form-label">제목</label>
-                                <input type="text" name="movieName" className="form-control" />
+                                <input type="text" name="movieName" className="form-control"
+                                    value={movie.movieName}
+                                    onChange={changeMovie}
+                                />
                             </div></div>
 
                             {/* 영화 포스터 업로드 및 미리보기 부분 시작 */}
@@ -238,7 +334,7 @@ const MovieList = (props) => {
                                     <label className="form-label">포스터</label>
                                     <input
                                         type="file"
-                                        name="imageNo"
+                                        name="movieImage"
                                         className="form-control"
                                         onChange={handleImageChange}
                                     />
@@ -257,33 +353,36 @@ const MovieList = (props) => {
 
                             <div className="row mt-4"><div className="col">
                                 <label className="form-label">개봉일</label>
-                                <input type="date" name="movieReleaseDate" className="form-control" />
+                                <input type="date" name="movieReleaseDate" className="form-control"
+                                    value={movie.movieReleaseDate}
+                                    onChange={changeMovie}
+                                />
                             </div></div>
 
                             <div className="row mt-4"><div className="col">
                                 <label className="form-label">관람등급</label>
-                                <select name="movieLevel" className="form-select">
+                                <select name="movieLevel" className="form-select"  >
                                     <option value="">선택하세요</option>
-                                    <option>전체관람가</option>
-                                    <option>12세관람가</option>
-                                    <option>15세관람가</option>
-                                    <option>청소년관람불가</option>
+                                    <option value={movie.movieLevel} onChange={changeMovie}>전체관람가</option>
+                                    <option value={movie.movieLevel} onChange={changeMovie}>12세관람가</option>
+                                    <option value={movie.movieLevel} onChange={changeMovie}>15세관람가</option>
+                                    <option value={movie.movieLevel} onChange={changeMovie}>청소년관람불가</option>
                                 </select>
                             </div></div>
 
                             <div className="row mt-4"><div className="col">
-                                <label className="form-label">감독</label>
-                                <input type="date" name="movieDirectro" className="form-control" />
+                                <label className="form-label" vlaue={movie.movieDirector} onChange={changeMovie}>감독</label>
+                                <input type="text" name="movieDirectro" className="form-control" />
                             </div></div>
 
                             <div className="row mt-4"><div className="col">
-                                <label className="form-label">상영시간</label>
+                                <label className="form-label" value={movie.movieTime} onChange={changeMovie}>상영시간</label>
                                 <input type="number" name="movieTime" className="form-control" />
                             </div></div>
 
                             <div className="row mt-4"><div className="col">
-                                <label className="form-label">제작국가</label>
-                                <input type="number" name="bookPageCount" className="form-control" />
+                                <label className="form-label" value={movie.movieNation} onChange={changeMovie}>제작국가</label>
+                                <input type="text" name="bookPageCount" className="form-control" />
                             </div></div>
 
                             <div className="row mt-4">
@@ -294,7 +393,7 @@ const MovieList = (props) => {
                                         <select name="genreName" className="form-select">
                                             <option value="">선택하세요</option>
                                             {genreList.map((genre, index) => (
-                                                <option key={index} value={genre.genreName}>
+                                                <option key={index} value={genre.genreName} vlaue={movie.genreName} onChange={changeMovie}>
                                                     {genre.genreName}
                                                 </option>
                                             ))}
@@ -313,7 +412,7 @@ const MovieList = (props) => {
 
                             <div className="row mt-4"><div className="col">
                                 <label className="form-label">줄거리</label>
-                                <textarea name="movieContent" className="form-control" />
+                                <textarea name="movieContent" className="form-control" value={movie.movieContent} onChange={changeMovie} />
                             </div></div>
 
                             <div className="row mt-4">
@@ -326,7 +425,7 @@ const MovieList = (props) => {
                                                     <input
                                                         type="text"
                                                         name={`movieActorRole${type}${index}`}
-                                                        value={actor}
+                                                        value={movie.actorRoleList}
                                                         onChange={(e) => handleActorChange(e, type, index)}
                                                         className="form-control"
                                                     />
@@ -350,8 +449,9 @@ const MovieList = (props) => {
                                         <label className="form-label">갤러리 이미지</label>
                                         <input
                                             type="file"
-                                            name={`galleryImage${index}`}
+                                            name={`movieImageList${index}`}
                                             className="form-control"
+                                            value={movie.movieImageList}
                                             onChange={(e) => handleGalleryImageChange(e, index)}
                                         />
                                         {galleryImage.preview && (
@@ -380,7 +480,7 @@ const MovieList = (props) => {
                                     닫기
                                 </button>
                                 {/* {movie.movieNo === undefined && */}
-                                <button className="btn btn-success">
+                                <button className="btn btn-success" onClick={saveMovie}>
                                     저장
                                 </button>
                                 {/* } */}
