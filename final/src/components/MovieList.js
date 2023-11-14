@@ -9,6 +9,7 @@ const MovieList = (props) => {
     const location = useLocation();
     const [movieList, setMovieList] = useState([]);
     const [genreList, setGenreList] = useState([]);
+    const fileChooser = useRef();
     const [movie, setMovie] = useState({
         movieImage: null,
         movieImageList: [],
@@ -23,6 +24,25 @@ const MovieList = (props) => {
         actorNoList: "",
         actorRoleList: "",
     });
+
+
+
+    // 장르, 배우, 갤러리 이미지 닫기 버튼 구현
+    const removeGenreInput = (index) => {
+        setGenres((prevGenres) => prevGenres.filter((_, i) => i !== index));
+    };
+
+    const removeActorInput = (type, index) => {
+        setActors((prevActors) => {
+            const updatedActors = { ...prevActors };
+            updatedActors[type] = prevActors[type].filter((_, i) => i !== index);
+            return updatedActors;
+        });
+    };
+
+    const removeGalleryImageInput = (index) => {
+        setGalleryImages((prevGalleryImages) => prevGalleryImages.filter((_, i) => i !== index));
+    };
 
 
     const loadMovie = async () => {
@@ -64,7 +84,7 @@ const MovieList = (props) => {
     const clearMovie = () => {
         setMovie({
             movieImage: null,
-            movieImageList: null,
+            movieImageList: [],
             movieName: "",
             movieDirector: "",
             movieReleaseDate: "",
@@ -74,8 +94,31 @@ const MovieList = (props) => {
             movieContent: "",
             genreNameList: "",
             actorNoList: "",
-            actorRoleList: ""
+            actorRoleList: "",
         });
+        fileChooser.current.value = ""; // 실제 태그 초기화
+        setPreviewImage([{ file: null, preview: null }]);
+        setGalleryImages([{ file: null, preview: null }]);
+        setGenres([{ genreName: '' }]);
+        setActors({
+            주연: [],
+            조연: [],
+            단역: [],
+            엑스트라: [],
+            특별출연: [],
+            우정출연: [],
+            성우: [],
+        });
+        setExpandedSections({
+            주연: false,
+            조연: false,
+            단역: false,
+            엑스트라: false,
+            특별출연: false,
+            우정출연: false,
+            성우: false,
+        });
+
     };
 
     // 영화 삭제
@@ -95,6 +138,22 @@ const MovieList = (props) => {
 
     const saveMovie = async () => {
         try {
+            if (
+                !movie.movieName ||
+                !movie.movieDirector ||
+                !movie.movieReleaseDate ||
+                !movie.movieTime ||
+                !movie.movieLevel ||
+                !movie.movieNation ||
+                !movie.movieContent ||
+                !previewImage.file ||
+                genres.length === 0 || // Check if at least one genre is selected
+                !Object.values(actors).some((actorList) => actorList.length > 0) // Check if at least one actor is provided in any category
+            ) {
+                alert("모든 값을 입력해주세요!");
+                return;
+            }
+
             const formData = new FormData();
 
             // 영화 제목, 영화 이미지, 영화 감독, 영화 개봉일, 영화 상영 시간, 영화 등급, 영화 국가, 영화 내용, 영화 장르 추가
@@ -111,16 +170,16 @@ const MovieList = (props) => {
             // formData.append("movieImageList", galleryImages);
 
             // 영화 이미지 목록 추가
-            galleryImages.map(img=>img.file).forEach(img=>formData.append("movieImageList", img));  
+            galleryImages.map(img => img.file).forEach(img => formData.append("movieImageList", img));
             // 영화 장르 추가
-            genres.map(genre=>genre.genreName).forEach(genreName=>formData.append("genreNameList", genreName));
+            genres.map(genre => genre.genreName).forEach(genreName => formData.append("genreNameList", genreName));
 
             // 배우 번호 목록 추가
             // 배우는 번호따로 역할따로 순서맞게
             // {주연: [], 조연: [], 단역: [], 엑스트라: [], 특별출연: [], 우정출연: [], 성우: []}
-            Object.keys(actors).forEach(key=>{
+            Object.keys(actors).forEach(key => {
                 const array = actors[key];
-                array.forEach(no=>{
+                array.forEach(no => {
                     formData.append("actorNoList", no);
                     formData.append("actorRoleList", key);
                 });
@@ -232,7 +291,7 @@ const MovieList = (props) => {
 
 
     // 포스터 미리보기 함수
-    const [previewImage, setPreviewImage] = useState({file:null,preview:null});
+    const [previewImage, setPreviewImage] = useState({ file: null, preview: null });
 
     // 포스터가 선택될 때 호출되는 함수
     const handleImageChange = (event) => {
@@ -242,15 +301,17 @@ const MovieList = (props) => {
             // 선택된 파일이 있을 경우 미리보기 업데이트
             const reader = new FileReader();
             reader.onloadend = () => {
-                setPreviewImage({file:selectedFile, preview:reader.result});
+                setPreviewImage({ file: selectedFile, preview: reader.result });
             };
             reader.readAsDataURL(selectedFile);
         } else {
+            fileChooser.current.value = "";//실제 태그 초기화 
             setPreviewImage(null);
             setMovie((prevMovie) => ({
                 ...prevMovie,
                 movieImage: null,
             }));
+
         }
     };
 
@@ -276,11 +337,11 @@ const MovieList = (props) => {
             const reader = new FileReader();
             reader.onloadend = () => {
                 setGalleryImages((prevGalleryImages) => {
-                    return prevGalleryImages.map((image, i)=>{
-                        if(i === index) {
+                    return prevGalleryImages.map((image, i) => {
+                        if (i === index) {
                             return {
-                                file:selectedFile,
-                                preview:reader.result
+                                file: selectedFile,
+                                preview: reader.result
                             };
                         }
                         return image;
@@ -292,15 +353,33 @@ const MovieList = (props) => {
     };
 
     //장르 변경 함수
-    const changeGenre = (e, index)=>{
-        const newGenres = genres.map((genre, i)=>{
-            if(i === index) {
-                return {genreName : e.target.value}
-            }
-            return genre;
-        });
-        setGenres(newGenres);
+    const changeGenre = (e, index) => {
+        const selectedGenre = e.target.value;
+        // Check if the selected genre is already chosen
+        const isGenreSelected = genres.some((genre, i) => i !== index && genre.genreName === selectedGenre);
+
+        if (!isGenreSelected) {
+            const newGenres = genres.map((genre, i) => {
+                if (i === index) {
+                    return { genreName: selectedGenre }
+                }
+                return genre;
+            });
+            setGenres(newGenres);
+        } else {
+            // Handle the case where the genre is already selected (e.g., show a warning)
+            alert("장르를 중복선택할 수 없습니다!");
+        }
     };
+    // const changeGenre = (e, index) => {
+    //     const newGenres = genres.map((genre, i) => {
+    //         if (i === index) {
+    //             return { genreName: e.target.value }
+    //         }
+    //         return genre;
+    //     });
+    //     setGenres(newGenres);
+    // };
 
     return (
         <>
@@ -388,12 +467,13 @@ const MovieList = (props) => {
                                         name="movieImage"
                                         className="form-control"
                                         onChange={handleImageChange}
+                                        ref={fileChooser}
                                     />
                                     {previewImage && (
                                         <div className="mt-2">
                                             <img
                                                 src={previewImage.preview}
-                                                alt="미리보기"
+                                                // alt="미리보기"
                                                 className="img-fluid"
                                             />
                                         </div>
@@ -445,7 +525,7 @@ const MovieList = (props) => {
                                             name="genreNameList"
                                             className="form-select"
                                             value={genre.genreName}
-                                            onChange={(e)=>changeGenre(e, index)}
+                                            onChange={(e) => changeGenre(e, index)}
                                             data-index={index}
                                         >
                                             <option value="">선택하세요</option>
@@ -455,6 +535,12 @@ const MovieList = (props) => {
                                                 </option>
                                             ))}
                                         </select>
+                                        <button
+                                            className="btn btn-danger mt-2"
+                                            onClick={() => removeGenreInput(index)}
+                                        >
+                                            삭제
+                                        </button>
                                     </div>
                                 ))}
                                 <div className="col">
@@ -488,6 +574,12 @@ const MovieList = (props) => {
                                                         onChange={(e) => handleActorChange(e, type, index)}
                                                         className="form-control"
                                                     />
+                                                    <button
+                                                        className="btn btn-danger mt-2"
+                                                        onClick={() => removeActorInput(type, index)}
+                                                    >
+                                                        삭제
+                                                    </button>
                                                 </div>
                                             ))}
                                         <div>
@@ -512,6 +604,7 @@ const MovieList = (props) => {
                                             className="form-control"
                                             value={movie.movieImageList}
                                             onChange={(e) => handleGalleryImageChange(e, index)}
+                                            ref={fileChooser}
                                         />
                                         {galleryImage.preview && (
                                             <img
@@ -520,6 +613,12 @@ const MovieList = (props) => {
                                                 className="img-fluid mt-2"
                                             />
                                         )}
+                                        <button
+                                            className="btn btn-danger mt-2"
+                                            onClick={() => removeGalleryImageInput(index)}
+                                        >
+                                            삭제
+                                        </button>
                                     </div>
                                 ))}
                                 <div className="col-4">
