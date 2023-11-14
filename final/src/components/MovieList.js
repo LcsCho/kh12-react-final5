@@ -10,6 +10,13 @@ const MovieList = (props) => {
     const [movieList, setMovieList] = useState([]);
     const [genreList, setGenreList] = useState([]);
     const fileChooser = useRef();
+
+    const [selectedMovie, setSelectedMovie] = useState(null);
+
+    const openMovieDetailsModal = (movie) => {
+        setSelectedMovie(movie);
+        openModal();
+    };
     const [movie, setMovie] = useState({
         movieImage: null,
         movieImageList: [],
@@ -413,8 +420,13 @@ const MovieList = (props) => {
                             {movieList.map((movie, index) => (
                                 <tr>
                                     <td>{movie.movieNo}</td>
-                                    <td><NavLink className={`nav-link ${location.pathname === '/movieDetail' ? 'active' : ''}`}
-                                        to="/movieDetail">{movie.movieName}</NavLink></td>
+                                    <td>
+                                        <div className="row">
+                                            <button className="btn btn-secondary" onClick={() => openMovieDetailsModal(movie)}>
+                                                {movie.movieName}
+                                            </button>
+                                        </div>
+                                    </td>
                                     <td>{movie.movieDirector}</td>
                                     <td>{movie.movieReleaseDate}</td>
                                     <td>{movie.genreName}</td>
@@ -445,9 +457,6 @@ const MovieList = (props) => {
                     <div className="modal-content">
                         <div className="modal-header">
                             <h5 className="modal-title" >영화 등록</h5>
-                            {/* <button type="button" className="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button> */}
                         </div>
                         <div className="modal-body">
                             <div className="row"><div className="col">
