@@ -156,7 +156,8 @@ const ActorList = (props) => {
             setActor({
                 ...actor,
                 actorImage: selectedFile,
-            });                
+            });    
+
                 // 선택된 파일이 있을 경우 미리보기 업데이트
                 const reader = new FileReader();
                 reader.onloadend = () => {
@@ -212,12 +213,12 @@ const ActorList = (props) => {
                 });
                 console.log(imageResponse); 
                 
-                const actorImage = imageResponse.data ? new Blob([imageResponse.data], { type: imageResponse.headers['content-type'] }) : null;
+                const actorImage = imageResponse.data ? new Blob([imageResponse.data], { type: imageResponse.headers['content-type'] }) : null;;
                 // 배우 정보와 이미지 정보를 state에 업데이트
                 setActor({
                     actorNo: actorResponse.data.actorNo,
                     actorName: actorResponse.data.actorName,
-                    actorImage: actorImage,
+                    actorImage: null,//이미지를 set 하진 않고 미리보기만
                 });
         
                 // 불러온 이미지를 미리보기로 업데이트
