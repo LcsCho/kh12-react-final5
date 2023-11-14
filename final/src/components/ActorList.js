@@ -210,16 +210,18 @@ const ActorList = (props) => {
                     method: "get",
                     responseType: "arraybuffer",
                 });
-        
+                console.log(imageResponse); 
+                
+                const actorImage = imageResponse.data ? new Blob([imageResponse.data], { type: imageResponse.headers['content-type'] }) : null;
                 // 배우 정보와 이미지 정보를 state에 업데이트
                 setActor({
                     actorNo: actorResponse.data.actorNo,
                     actorName: actorResponse.data.actorName,
-                    actorImage: new Blob([imageResponse.data], { type: imageResponse.headers['content-type'] }),
+                    actorImage: actorImage,
                 });
         
                 // 불러온 이미지를 미리보기로 업데이트
-                setPreviewImage(URL.createObjectURL(new Blob([imageResponse.data], { type: imageResponse.headers['content-type'] })));
+                setPreviewImage(URL.createObjectURL(actorImage));
         
             } catch (error) {
                 console.error("Failed to load actor details:", error);
@@ -235,7 +237,7 @@ const ActorList = (props) => {
                 console.log(actor.actorName);
         
                 // actor 이미지가 변경된 경우에만 FormData에 추가
-                if (actor.actorImage) {
+                if (actor.actorImage != null && actor.actorImage instanceof Blob) {
                     formData.append("actorImage", actor.actorImage);
                     console.log(actor.actorImage);
                 }
