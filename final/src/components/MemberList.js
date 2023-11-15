@@ -56,7 +56,7 @@ const MemberList = (props) => {
         }
     };
 
-     // 회원 닉네임 검색 코드
+     // 회원 검색 코드
      const [memberNickname, setMemberNickname] = useState('');
      const loadSearch = async () => {
          try {
