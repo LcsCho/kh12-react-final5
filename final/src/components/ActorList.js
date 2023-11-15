@@ -5,6 +5,7 @@ import { LiaEdit } from "react-icons/lia";
 import { useState, useRef, useEffect } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import { MdOutlineClear } from "react-icons/md";
+import { FaUser } from "react-icons/fa";
 
 const ActorList = (props) => {
 
@@ -328,7 +329,7 @@ const ActorList = (props) => {
                                                 style={{ maxWidth: "100px", maxHeight: "100px" }}
                                             />
                                         ) : (
-                                            "이미지 없음"
+                                            <FaUser style={{maxWidth: "100px", maxHeight: "100px"}}/>
                                         )}
                                     </td>
                                     <td>

@@ -73,7 +73,7 @@ const MovieDetail = (props) => {
             ) : (
                 movie && (
                     <>
-                        <h1 style={{ color: '#B33939', fontSize: '40px', fontWeight: 'bold' }}>{movie.movieName}</h1>
+                        <h1 className="text-center" style={{ color: '#B33939', fontSize: '40px', fontWeight: 'bold' }}>{movie.movieName}</h1>
 
                         <div className="col text-center">
                             <table className="table">
@@ -106,7 +106,7 @@ const MovieDetail = (props) => {
                                     </tr>
                                     <tr>
                                         <th>상영 시간</th>
-                                        <td>{movie.movieTime}</td>
+                                        <td>{movie.movieTime}분</td>
                                     </tr>
                                     <tr>
                                         <th>등급</th>
@@ -141,6 +141,7 @@ const MovieDetail = (props) => {
                                             {movieActorRole && movieActorRole.length > 0 ? (
                                                         movieActorRole.map((actorRoleItem, index) => (
                                                             <span key={index}>
+                                                                {index > 0 && ", "}
                                                                 {actorRoleItem.actorNo}({actorRoleItem.actorRole})
                                                             </span>
                                                         ))
