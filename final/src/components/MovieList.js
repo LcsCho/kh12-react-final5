@@ -234,9 +234,9 @@ const MovieList = (props) => {
     };
 
     useEffect(() => {
+        loadSearch();
         loadMovie();
         loadGenre();
-        loadSearch();
     }, []);
 
     // 모달 세팅
