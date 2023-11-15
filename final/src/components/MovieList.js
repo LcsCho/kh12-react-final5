@@ -11,6 +11,7 @@ const MovieList = (props) => {
     const [genreList, setGenreList] = useState([]);
     const fileChooser = useRef();
 
+
     const [selectedMovie, setSelectedMovie] = useState(null);
 
     const openMovieDetailsModal = (movie) => {
@@ -48,7 +49,10 @@ const MovieList = (props) => {
     };
 
     const removeGalleryImageInput = (index) => {
-        setGalleryImages((prevGalleryImages) => prevGalleryImages.filter((_, i) => i !== index));
+        setGalleryImages((prevGalleryImages) => {
+            const updatedGalleryImages = prevGalleryImages.filter((_, i) => i !== index);
+            return updatedGalleryImages;
+        });
     };
 
 
@@ -61,7 +65,6 @@ const MovieList = (props) => {
     };
 
     const changeMovie = (e) => {
-        console.log(e.target.name, e.target.value);
         setMovie((prevMovie) => {
             if (e.target.name === 'genreNameList') {
                 return {
@@ -103,8 +106,9 @@ const MovieList = (props) => {
             actorNoList: "",
             actorRoleList: "",
         });
-        fileChooser.current.value = ""; // 실제 태그 초기화
-        setPreviewImage([{ file: null, preview: null }]);
+
+
+        clearMovieImage();
         setGalleryImages([{ file: null, preview: null }]);
         setGenres([{ genreName: '' }]);
         setActors({
@@ -229,6 +233,7 @@ const MovieList = (props) => {
     useEffect(() => {
         loadMovie();
         loadGenre();
+        loadSearch();
     }, []);
 
     // 모달 세팅
@@ -388,13 +393,43 @@ const MovieList = (props) => {
     //     setGenres(newGenres);
     // };
 
+    const clearMovieImage = e => {
+        //console.log(fileChooser.current);
+        fileChooser.current.value = "";
+        setPreviewImage({ file: null, preview: null });
+    };
+
+    // 영화 제목 검색 코드
+    const [movieName, setMovieName] = useState('');
+    const loadSearch = async () => {
+        try {
+            const response = await axios({
+                url: `${process.env.REACT_APP_REST_API_URL}/movie/adminSearch/${movieName}`,
+                method: "get",
+                params: {
+                    movieName: movieName,
+                },
+            });
+            setMovieList(response.data);
+
+        } catch (error) {
+            console.error('검색 오류', error);
+        }
+    };
+
     return (
         <>
             <h3 style={{ color: '#B33939', marginTop: '50px', marginBottom: '50px' }}>영화 목록</h3>
-            <div className="text-end">
-
-                <button className="btn btn-danger" onClick={openModal}>
-                    <AiOutlineUnorderedList />영화 등록
+            <div className="text-center mt-3 d-flex align-items-center justify-content-center">
+                <input
+                    type="text"
+                    placeholder="검색어를 입력하세요"
+                    value={movieName}
+                    onChange={(e) => setMovieName(e.target.value)}  
+                    className="form-control me-2"
+                />
+                <button className="btn btn-danger h-100" onClick={loadSearch}>
+                    검색
                 </button>
             </div>
 
@@ -422,9 +457,12 @@ const MovieList = (props) => {
                                     <td>{movie.movieNo}</td>
                                     <td>
                                         <div className="row">
-                                            <button className="btn btn-secondary" onClick={() => openMovieDetailsModal(movie)}>
+                                            <NavLink
+                                                className={`nav-link ${location.pathname === `/movieDetail/${movie.movieNo}` ? 'active' : ''}`}
+                                                to={`/movieDetail/${movie.movieNo}`}
+                                            >
                                                 {movie.movieName}
-                                            </button>
+                                            </NavLink>
                                         </div>
                                     </td>
                                     <td>{movie.movieDirector}</td>
@@ -512,7 +550,7 @@ const MovieList = (props) => {
 
                             <div className="row mt-4"><div className="col">
                                 <label className="form-label" >감독</label>
-                                <input type="text" name="movieDirector" className="form-control" vlaue={movie.movieDirector} onChange={changeMovie} />
+                                <input type="text" name="movieDirector" className="form-control" value={movie.movieDirector} onChange={changeMovie} />
                             </div></div>
 
                             <div className="row mt-4"><div className="col">
@@ -582,6 +620,7 @@ const MovieList = (props) => {
                                                         value={actorList[index] || ''}
                                                         onChange={(e) => handleActorChange(e, type, index)}
                                                         className="form-control"
+                                                        ref={fileChooser}
                                                     />
                                                     <button
                                                         className="btn btn-danger mt-2"
@@ -611,9 +650,7 @@ const MovieList = (props) => {
                                             type="file"
                                             name="movieImageList"
                                             className="form-control"
-                                            value={movie.movieImageList}
                                             onChange={(e) => handleGalleryImageChange(e, index)}
-                                            ref={fileChooser}
                                         />
                                         {galleryImage.preview && (
                                             <img

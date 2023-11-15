@@ -56,14 +56,44 @@ const MemberList = (props) => {
         }
     };
 
+     // 회원 닉네임 검색 코드
+     const [memberNickname, setMemberNickname] = useState('');
+     const loadSearch = async () => {
+         try {
+             const response = await axios({
+                 url: `${process.env.REACT_APP_REST_API_URL}/member/adminSearch/${memberNickname}`,
+                 method: "get",
+                 params: {
+                     memberNickname: memberNickname,
+                 },
+             });
+             setMemberList(response.data);
+ 
+         } catch (error) {
+             console.error('검색 오류', error);
+         }
+     };
+
     useEffect(() => {
         loadMember();
+        loadSearch();
     }, []);
 
     return (
         <>
             <h3 style={{ color: '#B33939', marginTop: '50px', marginBottom: '50px' }}>회원 목록</h3>
-
+            <div className="text-center mt-3 d-flex align-items-center justify-content-center">
+                <input
+                    type="text"
+                    placeholder="검색어를 입력하세요"
+                    value={memberNickname}
+                    onChange={(e) => setMemberNickname(e.target.value)}  
+                    className="form-control me-2"
+                />
+                <button className="btn btn-danger h-100" onClick={loadSearch}>
+                    검색
+                </button>
+            </div>
             <div className="row mt-4">
                 <div className="col text-center">
                     <table className="table">
