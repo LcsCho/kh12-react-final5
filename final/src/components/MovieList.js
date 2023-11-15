@@ -10,6 +10,7 @@ const MovieList = (props) => {
     const [movieList, setMovieList] = useState([]);
     const [genreList, setGenreList] = useState([]);
     const fileChooser = useRef();
+    const fileChoosers = useRef();
 
 
     const [selectedMovie, setSelectedMovie] = useState(null);
@@ -109,6 +110,7 @@ const MovieList = (props) => {
 
 
         clearMovieImage();
+        clearMovieImages();
         setGalleryImages([{ file: null, preview: null }]);
         setGenres([{ genreName: '' }]);
         setActors({
@@ -394,9 +396,12 @@ const MovieList = (props) => {
     // };
 
     const clearMovieImage = e => {
-        //console.log(fileChooser.current);
         fileChooser.current.value = "";
         setPreviewImage({ file: null, preview: null });
+    };
+    const clearMovieImages = e => {
+        fileChoosers.current.value = "";
+        setGalleryImages({ file: null, preview: null });
     };
 
     // 영화 제목 검색 코드
@@ -425,11 +430,16 @@ const MovieList = (props) => {
                     type="text"
                     placeholder="검색어를 입력하세요"
                     value={movieName}
-                    onChange={(e) => setMovieName(e.target.value)}  
+                    onChange={(e) => setMovieName(e.target.value)}
                     className="form-control me-2"
                 />
                 <button className="btn btn-danger h-100" onClick={loadSearch}>
                     검색
+                </button>
+            </div>
+            <div className="text-end">
+                <button className="btn btn-danger" onClick={openModal}>
+                    <AiOutlineUnorderedList />영화 등록
                 </button>
             </div>
 
@@ -582,12 +592,13 @@ const MovieList = (props) => {
                                                 </option>
                                             ))}
                                         </select>
-                                        <button
+                                        {index !== 0 && (<button
                                             className="btn btn-danger mt-2"
                                             onClick={() => removeGenreInput(index)}
                                         >
                                             삭제
                                         </button>
+                                        )}
                                     </div>
                                 ))}
                                 <div className="col">
@@ -646,12 +657,22 @@ const MovieList = (props) => {
                                 {galleryImages.map((galleryImage, index) => (
                                     <div key={index} className="col-4" value={movie.movieImageList} name="movieImageList">
                                         <label className="form-label">갤러리 이미지</label>
-                                        <input
-                                            type="file"
-                                            name="movieImageList"
-                                            className="form-control"
-                                            onChange={(e) => handleGalleryImageChange(e, index)}
-                                        />
+                                        {index == 0 ?
+                                            <input
+                                                type="file"
+                                                name="movieImageList"
+                                                className="form-control"
+                                                ref={fileChoosers}
+                                                onChange={(e) => handleGalleryImageChange(e, index)}
+                                            /> :
+                                            <input
+                                                type="file"
+                                                name="movieImageList"
+                                                className="form-control"
+                                                onChange={(e) => handleGalleryImageChange(e, index)}
+                                            />
+                                        }
+
                                         {galleryImage.preview && (
                                             <img
                                                 src={galleryImage.preview}
@@ -659,12 +680,14 @@ const MovieList = (props) => {
                                                 className="img-fluid mt-2"
                                             />
                                         )}
-                                        <button
-                                            className="btn btn-danger mt-2"
-                                            onClick={() => removeGalleryImageInput(index)}
-                                        >
-                                            삭제
-                                        </button>
+                                        {index !== 0 && (
+                                            <button
+                                                className="btn btn-danger mt-2"
+                                                onClick={() => removeGalleryImageInput(index)}
+                                            >
+                                                삭제
+                                            </button>
+                                        )}
                                     </div>
                                 ))}
                                 <div className="col-4">
