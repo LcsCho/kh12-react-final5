@@ -429,7 +429,7 @@ const MovieList = (props) => {
             <div className="text-center mt-3 d-flex align-items-center justify-content-center">
                 <input
                     type="text"
-                    placeholder="검색어를 입력하세요"
+                    placeholder="영화 제목을 입력하여 검색"
                     value={movieName}
                     onChange={(e) => setMovieName(e.target.value)}
                     className="form-control me-2"
@@ -482,13 +482,9 @@ const MovieList = (props) => {
                                     <td>{movie.movieNation}</td>
                                     <td>{movie.actorName}</td>
                                     <td>
-                                        <div className="d-flex container-fluid">
-                                            <div className="me-4">
-                                                <NavLink className={`nav-link ${location.pathname === '/reviewList' ? 'active' : ''}`}
-                                                    to="/reviewList">리뷰</NavLink>
-                                            </div>
+                                        <div className="row">
                                             <div>
-                                                <MdOutlineClear className="text-danger" style={{ fontSize: '1.5em' }} onClick={(e) => deleteMovie(movie)} />
+                                                <MdOutlineClear className="text-danger" style={{fontSize:'30px'}}onClick={(e) => deleteMovie(movie)} />
                                             </div>
                                         </div>
                                     </td>

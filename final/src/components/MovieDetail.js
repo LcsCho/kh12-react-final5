@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router";
 import axios from "axios";
+import { NavLink, useLocation } from "react-router-dom";
+import { AiOutlineUnorderedList } from "react-icons/ai";
 
 const MovieDetail = (props) => {
     const [movie, setMovie] = useState(null);
@@ -9,8 +11,8 @@ const MovieDetail = (props) => {
     const [movieMainImage, setMovieMainImage] = useState({ imageUrl: null });
     const [loading, setLoading] = useState(true);
     const [imageList, setImageList] = useState([]);
-
     const { movieNo } = useParams();
+    const location = useLocation();
 
     const loadMovie = async () => {
         try {
@@ -23,7 +25,7 @@ const MovieDetail = (props) => {
 
     const loadMovieActorRole = async () => {
         try {
-            const response = await axios.get(`${process.env.REACT_APP_REST_API_URL}/movieActorRole/movieNo/${movieNo}`);
+            const response = await axios.get(`${process.env.REACT_APP_REST_API_URL}/movie/actorInfoList/${movieNo}`);
             setMovieActorRole(response.data);
             console.log(response.data);
         } catch (error) {
@@ -62,7 +64,7 @@ const MovieDetail = (props) => {
         } catch (error) {
             console.error("이미지 번호 리스트 불러오기 오류", error);
         }
-    };    
+    };
 
     useEffect(() => {
         const loadData = async () => {
@@ -76,6 +78,33 @@ const MovieDetail = (props) => {
         loadData();
     }, [movieNo]);
 
+    const iconStyle = {
+        color: "#B33939",
+        opacity: "100%",
+    };
+    const navLinkStyle = {
+        opacity: "100%"
+    };
+    const spanStyle = {
+        color: "black",
+        opacity: "100%",
+    };
+
+
+    const IconNavLink = ({ icon, to, label }) => {
+        return (
+            <NavLink
+                style={navLinkStyle}
+                className={`nav-link ${location.pathname === to ? "active" : ""}`}
+                to={to}
+                display="inline-block"
+            >
+                {icon}
+                <span style={spanStyle}>{label}</span>
+            </NavLink>
+        );
+    };
+
     return (
         <>
             {loading ? (
@@ -84,8 +113,11 @@ const MovieDetail = (props) => {
                 movie && (
                     <>
                         {/* <h1 className="text-center" style={{ color: '#B33939', fontSize: '40px', fontWeight: 'bold' }}>{movie.movieName}({movieNo})</h1> */}
-
+                        <div className="col-md-4">
+                            <IconNavLink icon={<AiOutlineUnorderedList style={iconStyle} />} to="/movieList" label="뒤로 가기" />
+                        </div>
                         <div className="col text-center">
+
                             <table className="table">
                                 <tbody>
                                     <tr>
@@ -149,12 +181,12 @@ const MovieDetail = (props) => {
                                         <th>배우 이름(역할)</th>
                                         <td>
                                             {movieActorRole && movieActorRole.length > 0 ? (
-                                                        movieActorRole.map((actorRoleItem, index) => (
-                                                            <span key={index}>
-                                                                {index > 0 && ", "}
-                                                                {actorRoleItem.actorNo}({actorRoleItem.actorRole})
-                                                            </span>
-                                                        ))
+                                                movieActorRole.map((actorRoleItem, index) => (
+                                                    <span key={index}>
+                                                        {index > 0 && ", "}
+                                                        {actorRoleItem.actorName}({actorRoleItem.actorRole})
+                                                    </span>
+                                                ))
                                             ) : (
                                                 <p>배우 정보 없음</p>
                                             )}
@@ -163,21 +195,21 @@ const MovieDetail = (props) => {
                                     <tr>
                                         <th>갤러리</th>
                                         <td>
-                                        <div>
-                                {imageList.map((imageNo) => (
-                                    <img
-                                        key={imageNo}
-                                        src={`${process.env.REACT_APP_REST_API_URL}/image/${imageNo}`}
-                                        alt={`이미지-${imageNo}`}
-                                        style={{ maxWidth: "150px", maxHeight: "150px", margin: "5px" }}
-                                    />
-                                ))}
-                            </div>
+                                            <div>
+                                                {imageList.map((imageNo) => (
+                                                    <img
+                                                        key={imageNo}
+                                                        src={`${process.env.REACT_APP_REST_API_URL}/image/${imageNo}`}
+                                                        alt={`이미지-${imageNo}`}
+                                                        style={{ maxWidth: "150px", maxHeight: "150px", margin: "5px" }}
+                                                    />
+                                                ))}
+                                            </div>
                                         </td>
                                     </tr>
                                 </tbody>
                             </table>
-                           
+
                         </div>
                     </>
                 )
