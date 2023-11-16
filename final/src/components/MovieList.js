@@ -9,7 +9,7 @@ const MovieList = (props) => {
     const location = useLocation();
     const [movieList, setMovieList] = useState([]);
     const [genreList, setGenreList] = useState([]);
-    const [actorImageNoList, setActorImageNoList] = useState([]);
+    const [actorImageList, setActorImageList] = useState([]);
     const fileChooser = useRef();
     const fileChoosers = useRef();
 
@@ -227,6 +227,8 @@ const MovieList = (props) => {
         setGenreList(response.data);
     }
 
+
+
     useEffect(() => {
         loadSearch();
         loadMovie();
@@ -249,7 +251,6 @@ const MovieList = (props) => {
     const [genres, setGenres] = useState([{ genreName: '' }]);
 
 
-    //장르 선택 추가
     const addGenreInput = () => {
         setGenres((prevGenres) => [
             ...prevGenres,
@@ -292,22 +293,37 @@ const MovieList = (props) => {
         }));
     };
     // 배우 입력 값 변경 함수
-    const handleActorChange = async (e, type, index) => {
-        const actorName =e.target.value;
-        try{
-            const response = await axios.get(`${process.env.REACT_APP_REST_API_URL}/actor/findImageNoByActorName/${actorName}`);
-            console.log('서버 응답:', response.data);
-            const imageNoList =response.data;
-            // 이미지 번호 리스트를 상태에 저장
-            setActorImageNoList(imageNoList);
-            const updatedActors = { ...actors };
-            updatedActors[type][index] = e.target.value;
-            setActors(updatedActors);
-        }
-        catch(error){
-            console.error('이미지 번호를 가져오는 중 오류 발생', error);
-        }
+    const handleActorChange = async(e, type, index) => {
+        const actorName = e.target.value;
+        //console.log(actorName);
+        // if (actorName) {
+        //     try {
+        //         const response = await axios.get(
+        //             `${process.env.REACT_APP_REST_API_URL}/actor/findImageNoByActorName/${actorName}`
+        //         );
+        //         // response에서 이미지 번호 리스트를 추출하여 state에 저장
+        //         setActorImageList(response.data);
+        //     } catch (error) {
+        //         console.error('API 호출 에러', error);
+        //     }
+        // }
+        // console.log(actorImageList);
 
+
+        //const updatedActors = { ...actors };
+        //updatedActors[type][index] = actorName;
+        //setActors(updatedActors);
+
+        console.log(type, actorName);
+        setActors(prev=>({
+            ...prev,
+            [type]:prev[type].map((t, i)=>{
+                if(i === index) {
+                    return actorName;
+                }
+                return t;
+            })
+        }));
     };
 
 
@@ -620,7 +636,11 @@ const MovieList = (props) => {
                                 <textarea name="movieContent" className="form-control" value={movie.movieContent} onChange={changeMovie} />
                             </div></div>
 
-
+                            {actorImageList.map((imageNo) => (
+                                    <div key={imageNo}>
+                                        {imageNo}
+                                    </div>
+                            ))}
                             {/* 배우 번호로 등록 */}
                             <div className="row mt-4">
                                 {Object.entries(actors).map(([type, actorList]) => (
@@ -635,6 +655,7 @@ const MovieList = (props) => {
                                                         value={actorList[index] || ''}
                                                         onChange={(e) => handleActorChange(e, type, index)}
                                                         className="form-control"
+                                                        // ref={fileChooser}
                                                     />
                                                     <button
                                                         className="btn btn-danger mt-2"
@@ -693,6 +714,7 @@ const MovieList = (props) => {
                                         )}
                                     </div>
                                 ))}
+
                                 <div className="col-4">
                                     <button
                                         className="btn btn-secondary"
