@@ -83,13 +83,17 @@ const MovieDetail = (props) => {
             ) : (
                 movie && (
                     <>
-                        <h1 className="text-center" style={{ color: '#B33939', fontSize: '40px', fontWeight: 'bold' }}>{movie.movieName}</h1>
+                        {/* <h1 className="text-center" style={{ color: '#B33939', fontSize: '40px', fontWeight: 'bold' }}>{movie.movieName}({movieNo})</h1> */}
 
                         <div className="col text-center">
                             <table className="table">
                                 <tbody>
                                     <tr>
-                                        <th>영화 포스터</th>
+                                        <th>제목(번호)</th>
+                                        <td><h1 className="text-center" style={{ color: '#B33939', fontSize: '40px', fontWeight: 'bold' }}>{movie.movieName}({movieNo})</h1></td>
+                                    </tr>
+                                    <tr>
+                                        <th>포스터</th>
                                         <td>
                                             {movieMainImage.imageUrl ? (
                                                 <img
@@ -101,10 +105,6 @@ const MovieDetail = (props) => {
                                                 <p>이미지 없음</p>
                                             )}
                                         </td>
-                                    </tr>
-                                    <tr>
-                                        <th>영화 번호</th>
-                                        <td>{movie.movieNo}</td>
                                     </tr>
                                     <tr>
                                         <th>감독</th>
@@ -160,19 +160,24 @@ const MovieDetail = (props) => {
                                             )}
                                         </td>
                                     </tr>
-                                </tbody>
-                            </table>
-                            <h2>이미지 목록(영화 상세 이미지 임시로 띄움)</h2>
-                            <div>
+                                    <tr>
+                                        <th>갤러리</th>
+                                        <td>
+                                        <div>
                                 {imageList.map((imageNo) => (
                                     <img
                                         key={imageNo}
                                         src={`${process.env.REACT_APP_REST_API_URL}/image/${imageNo}`}
                                         alt={`이미지-${imageNo}`}
-                                        style={{ maxWidth: "200px", maxHeight: "200px", margin: "5px" }}
+                                        style={{ maxWidth: "150px", maxHeight: "150px", margin: "5px" }}
                                     />
                                 ))}
                             </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                           
                         </div>
                     </>
                 )
