@@ -8,6 +8,7 @@ const MovieDetail = (props) => {
     const [movieGenre, setMovieGenre] = useState(null);
     const [movieMainImage, setMovieMainImage] = useState({ imageUrl: null });
     const [loading, setLoading] = useState(true);
+    const [imageList, setImageList] = useState([]);
 
     const { movieNo } = useParams();
 
@@ -53,12 +54,21 @@ const MovieDetail = (props) => {
             console.error("이미지 불러오기 오류", error);
         }
     };
+    // 추가 부분: 이미지 번호 리스트를 가져와서 상태에 설정
+    const loadImageList = async () => {
+        try {
+            const response = await axios.get(`${process.env.REACT_APP_REST_API_URL}/movie/imageNoList/${movieNo}`);
+            setImageList(response.data);
+        } catch (error) {
+            console.error("이미지 번호 리스트 불러오기 오류", error);
+        }
+    };    
 
     useEffect(() => {
         const loadData = async () => {
             setLoading(true);
 
-            await Promise.all([loadMovie(), loadMovieActorRole(), loadMovieGenre(), loadMovieMainImage()]);
+            await Promise.all([loadMovie(), loadMovieActorRole(), loadMovieGenre(), loadMovieMainImage(), loadImageList()]);
 
             setLoading(false);
         };
@@ -152,6 +162,17 @@ const MovieDetail = (props) => {
                                     </tr>
                                 </tbody>
                             </table>
+                            <h2>이미지 목록(영화 상세 이미지 임시로 띄움)</h2>
+                            <div>
+                                {imageList.map((imageNo) => (
+                                    <img
+                                        key={imageNo}
+                                        src={`${process.env.REACT_APP_REST_API_URL}/image/${imageNo}`}
+                                        alt={`이미지-${imageNo}`}
+                                        style={{ maxWidth: "200px", maxHeight: "200px", margin: "5px" }}
+                                    />
+                                ))}
+                            </div>
                         </div>
                     </>
                 )
