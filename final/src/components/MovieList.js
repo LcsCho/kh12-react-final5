@@ -9,16 +9,17 @@ const MovieList = (props) => {
     const location = useLocation();
     const [movieList, setMovieList] = useState([]);
     const [genreList, setGenreList] = useState([]);
+    const [actorImageNoList, setActorImageNoList] = useState([]);
     const fileChooser = useRef();
     const fileChoosers = useRef();
 
 
     const [selectedMovie, setSelectedMovie] = useState(null);
 
-    const openMovieDetailsModal = (movie) => {
-        setSelectedMovie(movie);
-        openModal();
-    };
+    // const openMovieDetailsModal = (movie) => {
+    //     setSelectedMovie(movie);
+    //     openModal();
+    // };
     const [movie, setMovie] = useState({
         movieImage: null,
         movieImageList: [],
@@ -226,13 +227,6 @@ const MovieList = (props) => {
         setGenreList(response.data);
     }
 
-
-    const loadMovieDetail = async () => {
-        const response = await axios({
-
-        });
-    };
-
     useEffect(() => {
         loadSearch();
         loadMovie();
@@ -255,6 +249,7 @@ const MovieList = (props) => {
     const [genres, setGenres] = useState([{ genreName: '' }]);
 
 
+    //장르 선택 추가
     const addGenreInput = () => {
         setGenres((prevGenres) => [
             ...prevGenres,
@@ -297,10 +292,22 @@ const MovieList = (props) => {
         }));
     };
     // 배우 입력 값 변경 함수
-    const handleActorChange = (e, type, index) => {
-        const updatedActors = { ...actors };
-        updatedActors[type][index] = e.target.value;
-        setActors(updatedActors);
+    const handleActorChange = async (e, type, index) => {
+        const actorName =e.target.value;
+        try{
+            const response = await axios.get(`${process.env.REACT_APP_REST_API_URL}/actor/findImageNoByActorName/${actorName}`);
+            console.log('서버 응답:', response.data);
+            const imageNoList =response.data;
+            // 이미지 번호 리스트를 상태에 저장
+            setActorImageNoList(imageNoList);
+            const updatedActors = { ...actors };
+            updatedActors[type][index] = e.target.value;
+            setActors(updatedActors);
+        }
+        catch(error){
+            console.error('이미지 번호를 가져오는 중 오류 발생', error);
+        }
+
     };
 
 
@@ -628,7 +635,6 @@ const MovieList = (props) => {
                                                         value={actorList[index] || ''}
                                                         onChange={(e) => handleActorChange(e, type, index)}
                                                         className="form-control"
-                                                        ref={fileChooser}
                                                     />
                                                     <button
                                                         className="btn btn-danger mt-2"
