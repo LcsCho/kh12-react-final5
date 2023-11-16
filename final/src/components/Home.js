@@ -79,14 +79,17 @@ const Home = (props) => {
           <h1>관리자</h1>
           <hr />
           <div className="row text-center">
-            <div className="col-md-4">
+            <div className="col-md-3">
               <IconNavLink icon={<AiOutlineUnorderedList style={iconStyle} />} to="/actorList" label="배우 목록" />
             </div>
-            <div className="col-md-4">
+            <div className="col-md-3">
               <IconNavLink icon={<AiOutlineUnorderedList style={iconStyle} />} to="/movieList" label="영화 목록" />
             </div>
-            <div className="col-md-4">
+            <div className="col-md-3">
               <IconNavLink icon={<AiOutlineUnorderedList style={iconStyle} />} to="/memberList" label="회원 목록" />
+            </div>
+            <div className="col-md-3">
+              <IconNavLink icon={<AiOutlineUnorderedList style={iconStyle} />} to="/reviewList" label="리뷰 목록" />
             </div>
           </div>
           <hr />

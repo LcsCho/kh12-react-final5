@@ -286,7 +286,7 @@ const ActorList = (props) => {
             <div className="text-center mt-3 d-flex align-items-center justify-content-center">
                 <input
                     type="text"
-                    placeholder="검색어를 입력하세요"
+                    placeholder="배우이름을 입력하여 검색"
                     value={actorName}
                     onChange={(e) => setActorName(e.target.value)}
                     className="form-control me-2"
