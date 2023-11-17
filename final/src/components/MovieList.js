@@ -4,14 +4,13 @@ import { AiOutlinePlus, AiOutlineUnorderedList } from "react-icons/ai";
 import { useState, useRef, useEffect } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import { MdOutlineClear } from "react-icons/md";
+import { debounce } from 'lodash';
+
 const MovieList = (props) => {
     const location = useLocation();
     const [movieList, setMovieList] = useState([]);
     const [genreList, setGenreList] = useState([]);
-<<<<<<< HEAD
-=======
     const [actorImageList, setActorImageList] = useState([]);
->>>>>>> 694679403610891dcd6832e158ea97a1f9f800ef
     const fileChooser = useRef();
     const fileChoosers = useRef();
     const [selectedMovie, setSelectedMovie] = useState(null);
@@ -201,16 +200,13 @@ const MovieList = (props) => {
         });
         setGenreList(response.data);
     }
-<<<<<<< HEAD
     const loadMovieDetail = async () => {
         const response = await axios({
         });
     };
-=======
 
 
 
->>>>>>> 694679403610891dcd6832e158ea97a1f9f800ef
     useEffect(() => {
         loadSearch();
         loadMovie();
@@ -229,11 +225,6 @@ const MovieList = (props) => {
     };
     // 장르 세팅
     const [genres, setGenres] = useState([{ genreName: '' }]);
-<<<<<<< HEAD
-=======
-
-
->>>>>>> 694679403610891dcd6832e158ea97a1f9f800ef
     const addGenreInput = () => {
         setGenres((prevGenres) => [
             ...prevGenres,
@@ -273,33 +264,47 @@ const MovieList = (props) => {
             [type]: true,
         }));
     };
+
+
+
+
+
+    // 입력에 딜레이를 주기 위해 만든 코드
+    const debounce = (func, delay) => {
+        let timeoutId;
+        return function (...args) {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => {
+            func.apply(this, args);
+        }, delay);
+        };
+    };
+
     // 배우 입력 값 변경 함수
-<<<<<<< HEAD
     const handleActorChange = (e, type, index) => {
         const updatedActors = { ...actors };
         updatedActors[type][index] = e.target.value;
         setActors(updatedActors);
-=======
     const handleActorChange = async(e, type, index) => {
         const actorName = e.target.value;
-        //console.log(actorName);
-        // if (actorName) {
-        //     try {
-        //         const response = await axios.get(
-        //             `${process.env.REACT_APP_REST_API_URL}/actor/findImageNoByActorName/${actorName}`
-        //         );
-        //         // response에서 이미지 번호 리스트를 추출하여 state에 저장
-        //         setActorImageList(response.data);
-        //     } catch (error) {
-        //         console.error('API 호출 에러', error);
-        //     }
-        // }
-        // console.log(actorImageList);
+        console.log(actorName);
+        if (actorName) {
+            try {
+                const response = await axios.get(
+                    `${process.env.REACT_APP_REST_API_URL}/actor/findImageNoByActorName/${actorName}`
+                );
+                // response에서 이미지 번호 리스트를 추출하여 state에 저장
+                setActorImageList(response.data);
+            } catch (error) {
+                console.error('API 호출 에러', error);
+            }
+        }
+        console.log(actorImageList);
 
 
-        //const updatedActors = { ...actors };
-        //updatedActors[type][index] = actorName;
-        //setActors(updatedActors);
+        // const updatedActors = { ...actors };
+        // updatedActors[type][index] = actorName;
+        // setActors(updatedActors);
 
         console.log(type, actorName);
         setActors(prev=>({
@@ -311,8 +316,10 @@ const MovieList = (props) => {
                 return t;
             })
         }));
->>>>>>> 694679403610891dcd6832e158ea97a1f9f800ef
     };
+
+    const handleActorChangeDebounced = debounce(handleActorChange, 1000);
+
     // 포스터 미리보기 함수
     const [previewImage, setPreviewImage] = useState({ file: null, preview: null });
     // 포스터가 선택될 때 호출되는 함수
@@ -592,15 +599,12 @@ const MovieList = (props) => {
                                 <label className="form-label">줄거리</label>
                                 <textarea name="movieContent" className="form-control" value={movie.movieContent} onChange={changeMovie} />
                             </div></div>
-<<<<<<< HEAD
-=======
 
                             {actorImageList.map((imageNo) => (
                                     <div key={imageNo}>
                                         {imageNo}
                                     </div>
                             ))}
->>>>>>> 694679403610891dcd6832e158ea97a1f9f800ef
                             {/* 배우 번호로 등록 */}
                             <div className="row mt-4">
                                 {Object.entries(actors).map(([type, actorList]) => (
@@ -613,13 +617,10 @@ const MovieList = (props) => {
                                                         type="text"
                                                         name="actorNoList"
                                                         value={actorList[index] || ''}
-                                                        onChange={(e) => handleActorChange(e, type, index)}
+                                                        onChange={(e) => handleActorChangeDebounced(e, type, index)}
                                                         className="form-control"
-<<<<<<< HEAD
                                                         ref={fileChooser}
-=======
                                                         // ref={fileChooser}
->>>>>>> 694679403610891dcd6832e158ea97a1f9f800ef
                                                     />
                                                     <button
                                                         className="btn btn-danger mt-2"
