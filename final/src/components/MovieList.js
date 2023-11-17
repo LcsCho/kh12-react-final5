@@ -295,24 +295,24 @@ const MovieList = (props) => {
     // 배우 입력 값 변경 함수
     const handleActorChange = async(e, type, index) => {
         const actorName = e.target.value;
-        //console.log(actorName);
-        // if (actorName) {
-        //     try {
-        //         const response = await axios.get(
-        //             `${process.env.REACT_APP_REST_API_URL}/actor/findImageNoByActorName/${actorName}`
-        //         );
-        //         // response에서 이미지 번호 리스트를 추출하여 state에 저장
-        //         setActorImageList(response.data);
-        //     } catch (error) {
-        //         console.error('API 호출 에러', error);
-        //     }
-        // }
-        // console.log(actorImageList);
+        console.log(actorName);
+        if (actorName) {
+            try {
+                const response = await axios.get(
+                    `${process.env.REACT_APP_REST_API_URL}/actor/findImageNoByActorName/${actorName}`
+                );
+                // response에서 이미지 번호 리스트를 추출하여 state에 저장
+                setActorImageList(response.data);
+            } catch (error) {
+                console.error('API 호출 에러', error);
+            }
+        }
+        console.log(actorImageList);
 
 
-        //const updatedActors = { ...actors };
-        //updatedActors[type][index] = actorName;
-        //setActors(updatedActors);
+        const updatedActors = { ...actors };
+        updatedActors[type][index] = actorName;
+        setActors(updatedActors);
 
         console.log(type, actorName);
         setActors(prev=>({
