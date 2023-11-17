@@ -4,6 +4,7 @@ import { AiOutlinePlus, AiOutlineUnorderedList } from "react-icons/ai";
 import { useState, useRef, useEffect } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import { MdOutlineClear } from "react-icons/md";
+import { debounce } from 'lodash';
 
 const MovieList = (props) => {
     const location = useLocation();
@@ -292,27 +293,43 @@ const MovieList = (props) => {
             [type]: true,
         }));
     };
+
+
+
+
+
+    // 입력에 딜레이를 주기 위해 만든 코드
+    const debounce = (func, delay) => {
+        let timeoutId;
+        return function (...args) {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => {
+            func.apply(this, args);
+        }, delay);
+        };
+    };
+
     // 배우 입력 값 변경 함수
     const handleActorChange = async(e, type, index) => {
         const actorName = e.target.value;
-        //console.log(actorName);
-        // if (actorName) {
-        //     try {
-        //         const response = await axios.get(
-        //             `${process.env.REACT_APP_REST_API_URL}/actor/findImageNoByActorName/${actorName}`
-        //         );
-        //         // response에서 이미지 번호 리스트를 추출하여 state에 저장
-        //         setActorImageList(response.data);
-        //     } catch (error) {
-        //         console.error('API 호출 에러', error);
-        //     }
-        // }
-        // console.log(actorImageList);
+        console.log(actorName);
+        if (actorName) {
+            try {
+                const response = await axios.get(
+                    `${process.env.REACT_APP_REST_API_URL}/actor/findImageNoByActorName/${actorName}`
+                );
+                // response에서 이미지 번호 리스트를 추출하여 state에 저장
+                setActorImageList(response.data);
+            } catch (error) {
+                console.error('API 호출 에러', error);
+            }
+        }
+        console.log(actorImageList);
 
 
-        //const updatedActors = { ...actors };
-        //updatedActors[type][index] = actorName;
-        //setActors(updatedActors);
+        // const updatedActors = { ...actors };
+        // updatedActors[type][index] = actorName;
+        // setActors(updatedActors);
 
         console.log(type, actorName);
         setActors(prev=>({
@@ -326,7 +343,7 @@ const MovieList = (props) => {
         }));
     };
 
-
+    const handleActorChangeDebounced = debounce(handleActorChange, 1000);
 
     // 포스터 미리보기 함수
     const [previewImage, setPreviewImage] = useState({ file: null, preview: null });
@@ -653,7 +670,7 @@ const MovieList = (props) => {
                                                         type="text"
                                                         name="actorNoList"
                                                         value={actorList[index] || ''}
-                                                        onChange={(e) => handleActorChange(e, type, index)}
+                                                        onChange={(e) => handleActorChangeDebounced(e, type, index)}
                                                         className="form-control"
                                                         // ref={fileChooser}
                                                     />
