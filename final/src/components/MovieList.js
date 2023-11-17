@@ -4,14 +4,16 @@ import { AiOutlinePlus, AiOutlineUnorderedList } from "react-icons/ai";
 import { useState, useRef, useEffect } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import { MdOutlineClear } from "react-icons/md";
+import { debounce } from 'lodash';
 
 const MovieList = (props) => {
     const location = useLocation();
     const [movieList, setMovieList] = useState([]);
     const [genreList, setGenreList] = useState([]);
-    const [actorImageList, setActorImageList] = useState([]);
+    const [actorImageNoList, setActorImageNoList] = useState([]);//배우이미지번호 리스트
     const fileChooser = useRef();
     const fileChoosers = useRef();
+
 
 
     const [selectedMovie, setSelectedMovie] = useState(null);
@@ -233,7 +235,7 @@ const MovieList = (props) => {
         loadSearch();
         loadMovie();
         loadGenre();
-    }, []);
+    },[]);
 
     // 모달 세팅
     const bsModal = useRef();
@@ -292,22 +294,29 @@ const MovieList = (props) => {
             [type]: true,
         }));
     };
+
+    // debounce 함수로 감싸진 함수 생성
+    //통신 많이 하는걸 방지하려고 debounce 설정
+    const delayedFetchActorImage = debounce(fetchActorImage, 300);
+
+    // 이 함수는 실제로 요청을 보내는 함수입니다.
+    //배우 이름 입력을 받을 때 이미지 번호를 찾는 함수
+    async function fetchActorImage(actorName) {
+        try {
+            const response = await axios.get(
+                `${process.env.REACT_APP_REST_API_URL}/actor/findImageNoByActorName/${actorName}`
+            );
+            setActorImageNoList(response.data);
+        } catch (error) {
+            console.error('API 호출 에러', error);
+        }
+    }
+
     // 배우 입력 값 변경 함수
     const handleActorChange = async(e, type, index) => {
         const actorName = e.target.value;
         console.log(actorName);
-        if (actorName) {
-            try {
-                const response = await axios.get(
-                    `${process.env.REACT_APP_REST_API_URL}/actor/findImageNoByActorName/${actorName}`
-                );
-                // response에서 이미지 번호 리스트를 추출하여 state에 저장
-                setActorImageList(response.data);
-            } catch (error) {
-                console.error('API 호출 에러', error);
-            }
-        }
-        console.log(actorImageList);
+        delayedFetchActorImage(actorName);
 
 
         const updatedActors = { ...actors };
@@ -325,7 +334,6 @@ const MovieList = (props) => {
             })
         }));
     };
-
 
 
     // 포스터 미리보기 함수
@@ -636,11 +644,26 @@ const MovieList = (props) => {
                                 <textarea name="movieContent" className="form-control" value={movie.movieContent} onChange={changeMovie} />
                             </div></div>
 
-                            {actorImageList.map((imageNo) => (
+                            {/* {actorImageNoList.map((imageNo) => (
                                     <div key={imageNo}>
                                         {imageNo}
                                     </div>
+                            ))} */}
+
+                            {actorImageNoList.map((imageNo) => (
+                                <div key={imageNo}>
+                                    {/* 이미지를 렌더링하는 코드 수정 */}
+                                    <img
+                                        src={`${process.env.REACT_APP_REST_API_URL}/image/${imageNo}`}
+                                        alt={`이미지 ${imageNo}`}
+                                        className="img-fluid"
+
+                                    />
+                                </div>
                             ))}
+
+
+
                             {/* 배우 번호로 등록 */}
                             <div className="row mt-4">
                                 {Object.entries(actors).map(([type, actorList]) => (
@@ -673,6 +696,7 @@ const MovieList = (props) => {
                                             </button>
                                         </div>
                                     </div>
+                                    
                                 ))}
                             </div>
 
