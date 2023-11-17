@@ -8,6 +8,10 @@ const MovieList = (props) => {
     const location = useLocation();
     const [movieList, setMovieList] = useState([]);
     const [genreList, setGenreList] = useState([]);
+<<<<<<< HEAD
+=======
+    const [actorImageList, setActorImageList] = useState([]);
+>>>>>>> 694679403610891dcd6832e158ea97a1f9f800ef
     const fileChooser = useRef();
     const fileChoosers = useRef();
     const [selectedMovie, setSelectedMovie] = useState(null);
@@ -197,10 +201,16 @@ const MovieList = (props) => {
         });
         setGenreList(response.data);
     }
+<<<<<<< HEAD
     const loadMovieDetail = async () => {
         const response = await axios({
         });
     };
+=======
+
+
+
+>>>>>>> 694679403610891dcd6832e158ea97a1f9f800ef
     useEffect(() => {
         loadSearch();
         loadMovie();
@@ -219,6 +229,11 @@ const MovieList = (props) => {
     };
     // 장르 세팅
     const [genres, setGenres] = useState([{ genreName: '' }]);
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> 694679403610891dcd6832e158ea97a1f9f800ef
     const addGenreInput = () => {
         setGenres((prevGenres) => [
             ...prevGenres,
@@ -259,10 +274,44 @@ const MovieList = (props) => {
         }));
     };
     // 배우 입력 값 변경 함수
+<<<<<<< HEAD
     const handleActorChange = (e, type, index) => {
         const updatedActors = { ...actors };
         updatedActors[type][index] = e.target.value;
         setActors(updatedActors);
+=======
+    const handleActorChange = async(e, type, index) => {
+        const actorName = e.target.value;
+        //console.log(actorName);
+        // if (actorName) {
+        //     try {
+        //         const response = await axios.get(
+        //             `${process.env.REACT_APP_REST_API_URL}/actor/findImageNoByActorName/${actorName}`
+        //         );
+        //         // response에서 이미지 번호 리스트를 추출하여 state에 저장
+        //         setActorImageList(response.data);
+        //     } catch (error) {
+        //         console.error('API 호출 에러', error);
+        //     }
+        // }
+        // console.log(actorImageList);
+
+
+        //const updatedActors = { ...actors };
+        //updatedActors[type][index] = actorName;
+        //setActors(updatedActors);
+
+        console.log(type, actorName);
+        setActors(prev=>({
+            ...prev,
+            [type]:prev[type].map((t, i)=>{
+                if(i === index) {
+                    return actorName;
+                }
+                return t;
+            })
+        }));
+>>>>>>> 694679403610891dcd6832e158ea97a1f9f800ef
     };
     // 포스터 미리보기 함수
     const [previewImage, setPreviewImage] = useState({ file: null, preview: null });
@@ -543,6 +592,15 @@ const MovieList = (props) => {
                                 <label className="form-label">줄거리</label>
                                 <textarea name="movieContent" className="form-control" value={movie.movieContent} onChange={changeMovie} />
                             </div></div>
+<<<<<<< HEAD
+=======
+
+                            {actorImageList.map((imageNo) => (
+                                    <div key={imageNo}>
+                                        {imageNo}
+                                    </div>
+                            ))}
+>>>>>>> 694679403610891dcd6832e158ea97a1f9f800ef
                             {/* 배우 번호로 등록 */}
                             <div className="row mt-4">
                                 {Object.entries(actors).map(([type, actorList]) => (
@@ -557,7 +615,11 @@ const MovieList = (props) => {
                                                         value={actorList[index] || ''}
                                                         onChange={(e) => handleActorChange(e, type, index)}
                                                         className="form-control"
+<<<<<<< HEAD
                                                         ref={fileChooser}
+=======
+                                                        // ref={fileChooser}
+>>>>>>> 694679403610891dcd6832e158ea97a1f9f800ef
                                                     />
                                                     <button
                                                         className="btn btn-danger mt-2"
@@ -614,6 +676,7 @@ const MovieList = (props) => {
                                         )}
                                     </div>
                                 ))}
+
                                 <div className="col-4">
                                     <button
                                         className="btn btn-secondary"
