@@ -13,14 +13,11 @@ const MovieList = (props) => {
     const [actorImageList, setActorImageList] = useState([]);
     const fileChooser = useRef();
     const fileChoosers = useRef();
-
-
     const [selectedMovie, setSelectedMovie] = useState(null);
-
-    // const openMovieDetailsModal = (movie) => {
-    //     setSelectedMovie(movie);
-    //     openModal();
-    // };
+    const openMovieDetailsModal = (movie) => {
+        setSelectedMovie(movie);
+        openModal();
+    };
     const [movie, setMovie] = useState({
         movieImage: null,
         movieImageList: [],
@@ -35,14 +32,10 @@ const MovieList = (props) => {
         actorNoList: "",
         actorRoleList: "",
     });
-
-
-
     // 장르, 배우, 갤러리 이미지 닫기 버튼 구현
     const removeGenreInput = (index) => {
         setGenres((prevGenres) => prevGenres.filter((_, i) => i !== index));
     };
-
     const removeActorInput = (type, index) => {
         setActors((prevActors) => {
             const updatedActors = { ...prevActors };
@@ -50,15 +43,12 @@ const MovieList = (props) => {
             return updatedActors;
         });
     };
-
     const removeGalleryImageInput = (index) => {
         setGalleryImages((prevGalleryImages) => {
             const updatedGalleryImages = prevGalleryImages.filter((_, i) => i !== index);
             return updatedGalleryImages;
         });
     };
-
-
     const loadMovie = async () => {
         const response = await axios({
             url: `${process.env.REACT_APP_REST_API_URL}/movie/adminMovieList`,
@@ -66,7 +56,6 @@ const MovieList = (props) => {
         });
         setMovieList(response.data);
     };
-
     const changeMovie = (e) => {
         setMovie((prevMovie) => {
             if (e.target.name === 'genreNameList') {
@@ -109,8 +98,6 @@ const MovieList = (props) => {
             actorNoList: "",
             actorRoleList: "",
         });
-
-
         clearMovieImage();
         clearMovieImages();
         setGalleryImages([{ file: null, preview: null }]);
@@ -133,14 +120,11 @@ const MovieList = (props) => {
             우정출연: false,
             성우: false,
         });
-
     };
-
     // 영화 삭제
     const deleteMovie = (movie) => {
         const choice = window.confirm("정말 삭제하시겠습니까?");
         if (choice === false) return;
-
         axios({
             url: `${process.env.REACT_APP_REST_API_URL}/movie/${movie.movieNo}`,
             method: "delete",
@@ -150,8 +134,6 @@ const MovieList = (props) => {
             })
             .catch((err) => { });
     };
-
-
     const saveMovie = async () => {
         try {
             if (
@@ -169,9 +151,7 @@ const MovieList = (props) => {
                 alert("모든 값을 입력해주세요!");
                 return;
             }
-
             const formData = new FormData();
-
             // 영화 제목, 영화 이미지, 영화 감독, 영화 개봉일, 영화 상영 시간, 영화 등급, 영화 국가, 영화 내용, 영화 장르 추가
             formData.append("movieName", movie.movieName);
             formData.append("movieDirector", movie.movieDirector);
@@ -180,16 +160,13 @@ const MovieList = (props) => {
             formData.append("movieLevel", movie.movieLevel);
             formData.append("movieNation", movie.movieNation);
             formData.append("movieContent", movie.movieContent);
-
             //FormData를 만들 때 서버에서 List로 수신하게 하려면 같은 이름으로 낱개를 계속 추가해야 한다.
             formData.append("movieImage", previewImage.file);
             // formData.append("movieImageList", galleryImages);
-
             // 영화 이미지 목록 추가
             galleryImages.map(img => img.file).forEach(img => formData.append("movieImageList", img));
             // 영화 장르 추가
             genres.map(genre => genre.genreName).forEach(genreName => formData.append("genreNameList", genreName));
-
             // 배우 번호 목록 추가
             // 배우는 번호따로 역할따로 순서맞게
             // {주연: [], 조연: [], 단역: [], 엑스트라: [], 특별출연: [], 우정출연: [], 성우: []}
@@ -200,7 +177,6 @@ const MovieList = (props) => {
                     formData.append("actorRoleList", key);
                 });
             });
-
             // 영화 모든 것 등록
             const response = await axios.post(
                 `${process.env.REACT_APP_REST_API_URL}/movie/upload/`,
@@ -216,9 +192,6 @@ const MovieList = (props) => {
             console.error("에러 발생", error);
         }
     };
-
-
-
     // 장르 불러오기
     const loadGenre = async () => {
         const response = await axios({
@@ -227,6 +200,10 @@ const MovieList = (props) => {
         });
         setGenreList(response.data);
     }
+    const loadMovieDetail = async () => {
+        const response = await axios({
+        });
+    };
 
 
 
@@ -235,7 +212,6 @@ const MovieList = (props) => {
         loadMovie();
         loadGenre();
     }, []);
-
     // 모달 세팅
     const bsModal = useRef();
     const openModal = () => {
@@ -247,18 +223,14 @@ const MovieList = (props) => {
         modal.hide();
         clearMovie();
     };
-
     // 장르 세팅
     const [genres, setGenres] = useState([{ genreName: '' }]);
-
-
     const addGenreInput = () => {
         setGenres((prevGenres) => [
             ...prevGenres,
             { genreName: '' },
         ]);
     };
-
     // 배우 세팅
     const [actors, setActors] = useState({
         주연: [],
@@ -279,7 +251,6 @@ const MovieList = (props) => {
         우정출연: false,
         성우: false,
     });
-
     // 배우 입력 추가 함수
     const addActorInput = (type) => {
         // 배우 상태 업데이트: 새로운 입력 추가
@@ -310,6 +281,10 @@ const MovieList = (props) => {
     };
 
     // 배우 입력 값 변경 함수
+    const handleActorChange = (e, type, index) => {
+        const updatedActors = { ...actors };
+        updatedActors[type][index] = e.target.value;
+        setActors(updatedActors);
     const handleActorChange = async(e, type, index) => {
         const actorName = e.target.value;
         console.log(actorName);
@@ -347,11 +322,9 @@ const MovieList = (props) => {
 
     // 포스터 미리보기 함수
     const [previewImage, setPreviewImage] = useState({ file: null, preview: null });
-
     // 포스터가 선택될 때 호출되는 함수
     const handleImageChange = (event) => {
         const selectedFile = event.target.files[0];
-
         if (selectedFile) {
             // 선택된 파일이 있을 경우 미리보기 업데이트
             const reader = new FileReader();
@@ -366,15 +339,10 @@ const MovieList = (props) => {
                 ...prevMovie,
                 movieImage: null,
             }));
-
         }
     };
-
-
     // 갤러리 이미지 상태
     const [galleryImages, setGalleryImages] = useState([{ file: null, preview: null }]);
-
-
     // 갤러리 이미지 추가 함수
     const addGalleryImageInput = () => {
         setGalleryImages((prevGalleryImages) => [
@@ -382,11 +350,9 @@ const MovieList = (props) => {
             { file: null, preview: null },
         ]);
     };
-
     // 갤러리 이미지 변경 함수
     const handleGalleryImageChange = (event, index) => {
         const selectedFile = event.target.files[0];
-
         if (selectedFile) {
             // 선택된 파일이 있을 경우 미리보기 업데이트
             const reader = new FileReader();
@@ -406,13 +372,11 @@ const MovieList = (props) => {
             reader.readAsDataURL(selectedFile);
         }
     };
-
     //장르 변경 함수
     const changeGenre = (e, index) => {
         const selectedGenre = e.target.value;
         // Check if the selected genre is already chosen
         const isGenreSelected = genres.some((genre, i) => i !== index && genre.genreName === selectedGenre);
-
         if (!isGenreSelected) {
             const newGenres = genres.map((genre, i) => {
                 if (i === index) {
@@ -435,7 +399,6 @@ const MovieList = (props) => {
     //     });
     //     setGenres(newGenres);
     // };
-
     const clearMovieImage = e => {
         fileChooser.current.value = "";
         setPreviewImage({ file: null, preview: null });
@@ -444,7 +407,6 @@ const MovieList = (props) => {
         fileChoosers.current.value = "";
         setGalleryImages({ file: null, preview: null });
     };
-
     // 영화 제목 검색 코드
     const [movieName, setMovieName] = useState('');
     const loadSearch = async () => {
@@ -457,12 +419,10 @@ const MovieList = (props) => {
                 },
             });
             setMovieList(response.data);
-
         } catch (error) {
             console.error('검색 오류', error);
         }
     };
-
     return (
         <>
             <h3 style={{ color: '#B33939', marginTop: '50px', marginBottom: '50px' }}>영화 목록</h3>
@@ -483,11 +443,7 @@ const MovieList = (props) => {
                     <AiOutlineUnorderedList />영화 등록
                 </button>
             </div>
-
             <div className="row mt-4" >
-
-
-
                 <div className="col text-center">
                     <table className="table">
                         <thead>
@@ -534,7 +490,6 @@ const MovieList = (props) => {
                     </table>
                 </div>
             </div>
-
             {/* Modal */}
             <div className="modal fade" ref={bsModal}
                 data-bs-backdrop="static" tabIndex="-1" role="dialog" aria-hidden="true">
@@ -551,7 +506,6 @@ const MovieList = (props) => {
                                     onChange={changeMovie}
                                 />
                             </div></div>
-
                             {/* 영화 포스터 업로드 및 미리보기 부분 시작 */}
                             <div className="row mt-4">
                                 <div className="col">
@@ -575,7 +529,6 @@ const MovieList = (props) => {
                                 </div>
                             </div>
                             {/* 이미지 업로드 및 미리보기 부분 끝 */}
-
                             <div className="row mt-4"><div className="col">
                                 <label className="form-label">개봉일</label>
                                 <input type="date" name="movieReleaseDate" className="form-control"
@@ -583,7 +536,6 @@ const MovieList = (props) => {
                                     onChange={changeMovie}
                                 />
                             </div></div>
-
                             <div className="row mt-4"><div className="col">
                                 <label className="form-label">관람등급</label>
                                 <select name="movieLevel" className="form-select" value={movie.movieLevel} onChange={changeMovie}>
@@ -594,22 +546,18 @@ const MovieList = (props) => {
                                     <option>청소년관람불가</option>
                                 </select>
                             </div></div>
-
                             <div className="row mt-4"><div className="col">
                                 <label className="form-label" >감독</label>
                                 <input type="text" name="movieDirector" className="form-control" value={movie.movieDirector} onChange={changeMovie} />
                             </div></div>
-
                             <div className="row mt-4"><div className="col">
                                 <label className="form-label" >상영시간</label>
                                 <input type="number" name="movieTime" className="form-control" value={movie.movieTime} onChange={changeMovie} />
                             </div></div>
-
                             <div className="row mt-4"><div className="col">
                                 <label className="form-label" >제작국가</label>
                                 <input type="text" name="movieNation" className="form-control" value={movie.movieNation} onChange={changeMovie} />
                             </div></div>
-
                             {/* 장르 등록 */}
                             <div className="row mt-4">
                                 <label className="form-label">장르</label>
@@ -647,7 +595,6 @@ const MovieList = (props) => {
                                     </button>
                                 </div>
                             </div>
-
                             <div className="row mt-4"><div className="col">
                                 <label className="form-label">줄거리</label>
                                 <textarea name="movieContent" className="form-control" value={movie.movieContent} onChange={changeMovie} />
@@ -672,6 +619,7 @@ const MovieList = (props) => {
                                                         value={actorList[index] || ''}
                                                         onChange={(e) => handleActorChangeDebounced(e, type, index)}
                                                         className="form-control"
+                                                        ref={fileChooser}
                                                         // ref={fileChooser}
                                                     />
                                                     <button
@@ -692,7 +640,6 @@ const MovieList = (props) => {
                                     </div>
                                 ))}
                             </div>
-
                             {/* 갤러리 이미지 부분 시작 */}
                             <div className="row mt-4">
                                 {galleryImages.map((galleryImage, index) => (
@@ -713,7 +660,6 @@ const MovieList = (props) => {
                                                 onChange={(e) => handleGalleryImageChange(e, index)}
                                             />
                                         }
-
                                         {galleryImage.preview && (
                                             <img
                                                 src={galleryImage.preview}
@@ -761,5 +707,4 @@ const MovieList = (props) => {
         </>
     );
 };
-
 export default MovieList;
