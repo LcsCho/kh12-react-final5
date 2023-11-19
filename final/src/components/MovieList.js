@@ -11,6 +11,7 @@ const MovieList = (props) => {
     const [movieList, setMovieList] = useState([]);
     const [genreList, setGenreList] = useState([]);
     const [actorImageNoList, setActorImageNoList] = useState([]);//배우이미지번호 리스트
+    const [clickedActorInfo, setClickedActorInfo] = useState({ type: null, index: null });
     const fileChooser = useRef();
     const fileChoosers = useRef();
 
@@ -237,6 +238,7 @@ const MovieList = (props) => {
         loadGenre();
     },[]);
 
+
     // 모달 세팅
     const bsModal = useRef();
     const openModal = () => {
@@ -319,6 +321,10 @@ const MovieList = (props) => {
         delayedFetchActorImage(actorName);
 
 
+        // 이미지 클릭 시 해당 배우 정보를 전달하기 위해 type과 index를 저장
+        setClickedActorInfo({ type, index });
+
+
         const updatedActors = { ...actors };
         updatedActors[type][index] = actorName;
         setActors(updatedActors);
@@ -335,6 +341,33 @@ const MovieList = (props) => {
         }));
     };
 
+
+    // 이미지 클릭 시 실행되는 함수
+    const handleImageClick = (imageNo) => {
+        // setClickedActorInfo를 통해 저장한 type과 index 가져오기
+        const { type, index } = clickedActorInfo;
+        console.log('Type:', type, 'Index:', index);
+        
+        // 클릭한 이미지 번호를 이용하여 배우 번호 가져오는 axios 호출
+        axios.get(`${process.env.REACT_APP_REST_API_URL}/actor/findActorNoByImageNo/${imageNo}`)
+            .then((response) => {
+                const actorNo = response.data;
+
+                // 배우 번호를 해당 입력창의 value로 설정
+                const updatedActors = { ...actors };
+                updatedActors[type][index] = actorNo;
+                setActors(updatedActors);
+                
+                setActors((prev) => ({
+                    ...prev,
+                    [type]: prev[type].map((t, i) => (i === index ? actorNo : t)),
+                }));        
+
+            })
+            .catch((error) => {
+                console.error('API 호출 에러', error);
+            });
+    };
 
     // 포스터 미리보기 함수
     const [previewImage, setPreviewImage] = useState({ file: null, preview: null });
@@ -651,13 +684,15 @@ const MovieList = (props) => {
                             ))} */}
 
                             {actorImageNoList.map((imageNo) => (
-                                <div key={imageNo}>
+                                <div key={imageNo} >
                                     {/* 이미지를 렌더링하는 코드 수정 */}
+                                    {imageNo}
                                     <img
+                                        
                                         src={`${process.env.REACT_APP_REST_API_URL}/image/${imageNo}`}
                                         alt={`이미지 ${imageNo}`}
                                         className="img-fluid"
-
+                                        onClick={() => handleImageClick(imageNo)}
                                     />
                                 </div>
                             ))}
