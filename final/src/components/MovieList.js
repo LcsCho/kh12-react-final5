@@ -1,5 +1,5 @@
 import axios from "axios";
-import { Modal } from "bootstrap";
+import { Collapse, Modal } from "bootstrap";
 import { AiOutlinePlus, AiOutlineUnorderedList } from "react-icons/ai";
 import { useState, useRef, useEffect } from "react";
 import { NavLink, useLocation } from "react-router-dom";
@@ -304,6 +304,10 @@ const MovieList = (props) => {
     // 이 함수는 실제로 요청을 보내는 함수입니다.
     //배우 이름 입력을 받을 때 이미지 번호를 찾는 함수
     async function fetchActorImage(actorName) {
+        //입력창에 아무것도 없으면 axios통신 안보냄
+        if (!actorName) {
+            return;
+        }  
         try {
             const response = await axios.get(
                 `${process.env.REACT_APP_REST_API_URL}/actor/findImageNoByActorName/${actorName}`
@@ -318,17 +322,25 @@ const MovieList = (props) => {
     const handleActorChange = async(e, type, index) => {
         const actorName = e.target.value;
         console.log(actorName);
+        // 값이 비어있을 때 이미지를 안 보이도록
+      
         delayedFetchActorImage(actorName);
 
 
         // 이미지 클릭 시 해당 배우 정보를 전달하기 위해 type과 index를 저장
         setClickedActorInfo({ type, index });
 
-
+        
         const updatedActors = { ...actors };
         updatedActors[type][index] = actorName;
         setActors(updatedActors);
-
+        
+        console.log(actorImageNoList);
+        if (actorName =="") {
+            setActorImageNoList([]);
+            return;
+        }
+        
         console.log(type, actorName);
         setActors(prev=>({
             ...prev,
@@ -344,13 +356,17 @@ const MovieList = (props) => {
 
     // 이미지 클릭 시 실행되는 함수
     const handleImageClick = (imageNo) => {
+
+        console.log('handleImageClick 실행');
         // setClickedActorInfo를 통해 저장한 type과 index 가져오기
         const { type, index } = clickedActorInfo;
-        console.log('Type:', type, 'Index:', index);
+        
+        // console.log('Type:', type, 'Index:', index);
         
         // 클릭한 이미지 번호를 이용하여 배우 번호 가져오는 axios 호출
         axios.get(`${process.env.REACT_APP_REST_API_URL}/actor/findActorNoByImageNo/${imageNo}`)
             .then((response) => {
+
                 const actorNo = response.data;
 
                 // 배우 번호를 해당 입력창의 value로 설정
@@ -361,7 +377,13 @@ const MovieList = (props) => {
                 setActors((prev) => ({
                     ...prev,
                     [type]: prev[type].map((t, i) => (i === index ? actorNo : t)),
-                }));        
+                })); 
+                
+            // // 이미지 리스트 초기화
+
+            setActorImageNoList([]);
+            // 클릭 정보 초기화
+            setClickedActorInfo({ type: null, index: null });                
 
             })
             .catch((error) => {
@@ -685,6 +707,7 @@ const MovieList = (props) => {
 
                             {actorImageNoList.map((imageNo) => (
                                 <div key={imageNo} >
+                                    
                                     {/* 이미지를 렌더링하는 코드 수정 */}
                                     {imageNo}
                                     <img
