@@ -213,6 +213,7 @@ const MovieList = (props) => {
                     },
                 }
             );
+            loadMovie();
             closeModal();
             loadMovie();
         } catch (error) {
