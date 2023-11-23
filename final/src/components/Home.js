@@ -77,6 +77,8 @@ const Home = (props) => {
       <div className="col-md-10 offset-md-1 col-sm-10 offset-sm-1 mt-5">
         <div style={{ border: '2px solid #B33939', borderRadius: '5px', marginTop: '20px', marginBottom: '20px', width: "100%", height: "400px" }} className="p-4">
           <h1>관리자</h1>
+          <NavLink to="http://localhost:8080/" style={{ textDecoration: 'none', color: '#000' }}><h1>메인으로 이동</h1>
+          </NavLink>
           <hr />
           <div className="row text-center">
             <div className="col-md-3">
