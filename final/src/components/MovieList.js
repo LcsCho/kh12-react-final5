@@ -519,13 +519,14 @@ const MovieList = (props) => {
                     value={movieName}
                     onChange={(e) => setMovieName(e.target.value)}
                     className="form-control me-2"
+                    style={{width:'700px'}}
                 />
-                <button className="btn btn-danger h-100" onClick={loadSearch}>
+                <button className="btn btn-danger h-100" onClick={loadSearch} style={{lineHeight:"2"}}>
                     검색
                 </button>
             </div>
             <div className="text-end">
-                <button className="btn btn-danger" onClick={openModal}>
+                <button className="btn btn-danger" onClick={openModal} style={{ marginTop: '50px'}}>
                     <AiOutlineUnorderedList />영화 등록
                 </button>
             </div>
@@ -535,7 +536,7 @@ const MovieList = (props) => {
 
 
                 <div className="col text-center">
-                    <table className="table">
+                    <table className="table table-hover">
                         <thead>
                             <tr>
                                 <th width="5%">번호</th>

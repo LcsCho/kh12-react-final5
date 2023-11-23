@@ -35,11 +35,11 @@ const ReviewList = (props) => {
 
     return (
         <>
-            <h1 style={{ color: '#B33939', fontSize: '40px', fontWeight: 'bold' }}>리뷰 목록</h1>
+            <h3 style={{ color: '#B33939', marginTop: '50px', marginBottom: '50px' }}>리뷰 목록</h3>
 
             <div className="row mt-4" >
                 <div className="col text-center">
-                    <table className="table">
+                    <table className="table table-hover">
                         <thead>
                             <tr>
                                 <th width="20%">영화 제목</th>

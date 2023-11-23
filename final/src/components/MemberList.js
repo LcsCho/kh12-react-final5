@@ -82,30 +82,31 @@ const MemberList = (props) => {
     return (
         <>
             <h3 style={{ color: '#B33939', marginTop: '50px', marginBottom: '50px' }}>회원 목록</h3>
-            <div className="text-center mt-3 d-flex align-items-center justify-content-center">
+            <div className="text-center mt-3 d-flex align-items-center justify-content-center" style={{marginBottom:"80px"}}>
                 <input
                     type="text"
                     placeholder="회원 닉네임을 입력하여 검색"
                     value={memberNickname}
                     onChange={(e) => setMemberNickname(e.target.value)}  
                     className="form-control me-2"
+                    style={{width:'400px'}}
                 />
-                <button className="btn btn-danger h-100" onClick={loadSearch}>
+                <button className="btn btn-danger h-100" onClick={loadSearch} style={{lineHeight:"2"}}>
                     검색
                 </button>
             </div>
             <div className="row mt-4">
                 <div className="col text-center">
-                    <table className="table">
+                    <table className="table table-hover">
                         <thead>
                             <tr>
-                                <th width="30%">아이디</th>
+                                <th width="25%">아이디</th>
                                 <th width="15%">닉네임</th>
                                 <th width="15%">연락처</th>
                                 <th width="15%">생년월일</th>
                                 <th width="10%">가입일</th>
                                 <th width="5%">성별</th>
-                                <th width="10%">등급</th>
+                                <th width="15%">등급</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -118,10 +119,10 @@ const MemberList = (props) => {
                                     <td>{member.memberJoin}</td>
                                     <td>{member.memberGender}</td>
                                     <td>
-                                        <div className="row">
+                                        <div className="row ms-2">
                                             {editableMemberId === member.memberId ? (
-                                                <div className="row">
-                                                    <select
+                                                <div className="row mx-auto">
+                                                    <select className="form-select form-select-sm" 
                                                         value={editedMemberLevel}
                                                         onChange={handleLevelChange}
                                                     >
@@ -129,14 +130,14 @@ const MemberList = (props) => {
                                                         <option value="평론가">평론가</option>
                                                         <option value="관리자">관리자</option>
                                                     </select>
-                                                        <button className="btn btn-success" onClick={() => updateMember(member.memberId)}>수정</button>
-                                                        <button className="btn btn-secondary" onClick={handleCancelClick}>취소</button>
+                                                        <button className="btn btn-success btn-sm mt-2" onClick={() => updateMember(member.memberId)}>수정</button>
+                                                        <button className="btn btn-secondary btn-sm mt-2" onClick={handleCancelClick}>취소</button>
                                                 </div>
                                             ) : (
-                                                <>
+                                                <div className="row mx-auto">
                                                     <button className="btn btn-danger" onClick={() => handleEditClick(member.memberId, member.memberLevel)}>{member.memberLevel}
                                                     </button>
-                                                </>
+                                                </div>
                                             )}
                                         </div>
                                     </td>
