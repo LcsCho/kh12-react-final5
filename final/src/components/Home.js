@@ -3,6 +3,7 @@ import { useState, useRef, useEffect } from "react";
 import axios from "axios";
 import { NavLink, useLocation } from "react-router-dom";
 import { Modal } from "bootstrap";
+import { FaUser } from "react-icons/fa";
 
 const Home = (props) => {
 
@@ -80,22 +81,22 @@ const Home = (props) => {
           <hr />
           <div className="row text-center">
             <div className="col-md-3">
-              <IconNavLink icon={<AiOutlineUnorderedList style={iconStyle} />} to="/actorList" label="배우 목록" />
+              <IconNavLink icon={<AiOutlineUnorderedList style={iconStyle} />} to="/actorList" label=" 배우 목록" />
             </div>
             <div className="col-md-3">
-              <IconNavLink icon={<AiOutlineUnorderedList style={iconStyle} />} to="/movieList" label="영화 목록" />
+              <IconNavLink icon={<AiOutlineUnorderedList style={iconStyle} />} to="/movieList" label=" 영화 목록" />
             </div>
             <div className="col-md-3">
-              <IconNavLink icon={<AiOutlineUnorderedList style={iconStyle} />} to="/memberList" label="회원 목록" />
+              <IconNavLink icon={<AiOutlineUnorderedList style={iconStyle} />} to="/memberList" label=" 회원 목록" />
             </div>
             <div className="col-md-3">
-              <IconNavLink icon={<AiOutlineUnorderedList style={iconStyle} />} to="/reviewList" label="리뷰 목록" />
+              <IconNavLink icon={<AiOutlineUnorderedList style={iconStyle} />} to="/reviewList" label=" 리뷰 목록" />
             </div>
           </div>
           <hr />
           <div className="row text-center">
             <div className="col-md-4">
-              <p >[회원 수]</p>
+              <p className="mt-2"> <FaUser style={{maxWidth: "100px", maxHeight: "100px"}}/> 회원 수</p>
               <span>{memberCount}</span>
             </div>
             <div className="col-md-4">

@@ -283,19 +283,20 @@ const ActorList = (props) => {
     return (
         <>
             <h3 style={{ color: '#B33939', marginTop: '50px', marginBottom: '50px' }}>배우 목록</h3>
-            <div className="text-center mt-3 d-flex align-items-center justify-content-center">
+            <div className="text-center mt-3 d-flex align-items-center justify-content-center mx-auto">
                 <input
                     type="text"
                     placeholder="배우이름을 입력하여 검색"
                     value={actorName}
                     onChange={(e) => setActorName(e.target.value)}
                     className="form-control me-2"
+                    style={{width:'700px'}}
                 />
-                <button className="btn btn-danger h-100" onClick={loadSearch}>
+                <button className="btn btn-danger h-100" onClick={loadSearch} style={{lineHeight:"2"}}>
                     검색
                 </button>
             </div>
-            <div className="text-end">
+            <div className="text-end" style={{ marginTop: '50px'}}>
                 <button className="btn btn-danger" onClick={openModal}>
                     <AiOutlineUnorderedList />배우 등록
                 </button>
@@ -306,7 +307,7 @@ const ActorList = (props) => {
 
 
                 <div className="col text-center">
-                    <table className="table">
+                    <table className="table table-hover">
                         <thead>
                             <tr>
                                 <th width="10%">번호</th>
@@ -329,20 +330,20 @@ const ActorList = (props) => {
                                                 style={{ maxWidth: "100px", maxHeight: "100px" }}
                                             />
                                         ) : (
-                                            <FaUser style={{maxWidth: "100px", maxHeight: "100px"}}/>
+                                            <FaUser style={{maxWidth: "100px", maxHeight: "100px", marginTop:"12px"}}/>
                                         )}
                                     </td>
                                     <td>
                                         <div className="d-flex container-fluid">
                                             <div style={{ fontSize: "25px" }}>
-                                                <LiaEdit className="text-warning"
+                                                <LiaEdit className="text-warning ms-2"
                                                     onClick={(e) => editActor(actor)}
                                                 />
                                             </div>
                                             <div>
                                                 <MdOutlineClear
-                                                    className="text-danger"
-                                                    style={{ fontSize: "25px" }}
+                                                    className="text-danger ms-2"
+                                                    style={{ fontSize: "25px", marginTop:"9px" }}
                                                     onClick={(e) => deleteActor(actor)}
                                                 />
                                             </div>
