@@ -3,7 +3,9 @@ import { useState, useRef, useEffect } from "react";
 import axios from "axios";
 import { NavLink, useLocation } from "react-router-dom";
 import { Modal } from "bootstrap";
-import { FaUser } from "react-icons/fa";
+import { FcConferenceCall } from "react-icons/fc";
+import { FcFilmReel } from "react-icons/fc";
+import { IoIosStar } from "react-icons/io";
 
 const Home = (props) => {
 
@@ -98,15 +100,20 @@ const Home = (props) => {
           <hr />
           <div className="row text-center">
             <div className="col-md-4">
-              <p className="mt-2"> <FaUser style={{maxWidth: "100px", maxHeight: "100px"}}/> 회원 수</p>
+              <p className="mt-2">
+                <FcConferenceCall style={{maxWidth: "110px", maxHeight: "120px"}}/> 회원 수</p>
               <span>{memberCount}</span>
             </div>
             <div className="col-md-4">
-              <p>[영화 개수]</p>
+              <p className="mt-2">
+                <FcFilmReel style={{maxWidth: "110px", maxHeight: "120px"}}/>
+                영화 수</p>
               <span>{movieCount}</span>
             </div>
             <div className="col-md-4">
-              <p>[평점 수]</p>
+              <p className="mt-2">
+              <IoIosStar style={{maxWidth: "110px", maxHeight: "120px", color:"gold"}}/>
+                평점 수</p>
               <span>{ratingCount}</span>
             </div>
           </div>

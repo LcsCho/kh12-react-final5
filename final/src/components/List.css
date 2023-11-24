@@ -1,4 +1,4 @@
-@media screen and (max-width: 7px) {
+@media screen and (max-width: 512px) {
     .pc-only {
         display: none;
     }
