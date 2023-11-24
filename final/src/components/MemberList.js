@@ -305,15 +305,15 @@ const MemberList = (props) => {
                                 <tr key={index}>
                                     <td>{member.memberId}</td>
                                     <td>{member.memberNickname}</td>
-                                    <td>{member.memberContact}</td>
-                                    <td>{member.memberBirth}</td>
-                                    <td>{member.memberJoin}</td>
+                                    <td  className="pc-only">{member.memberContact}</td>
+                                    <td  className="pc-only">{member.memberBirth}</td>
+                                    <td  className="pc-only">{member.memberJoin}</td>
                                     <td>{member.memberGender}</td>
                                     <td>
                                         <div className="row ms-2">
                                             {editableMemberId === member.memberId ? (
                                                 <div className="row mx-auto">
-                                                    <select className="form-select form-select-sm"
+                                                    <select className="form-select form-select-sm mx-auto"
                                                         value={editedMemberLevel}
                                                         onChange={handleLevelChange}
                                                     >
