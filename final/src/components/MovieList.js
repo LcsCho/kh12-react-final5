@@ -251,6 +251,8 @@ const MovieList = (props) => {
         const modal = Modal.getInstance(bsModal.current);
         modal.hide();
         clearMovie();
+        setActorImageNoList([]);
+        
     };
 
     // 장르 세팅
@@ -320,10 +322,14 @@ const MovieList = (props) => {
         }
     }
 
+
+
+
     // 배우 입력 값 변경 함수
     const handleActorChange = async(e, type, index) => {
+
+
         const actorName = e.target.value;
-        console.log(actorName);
         // 값이 비어있을 때 이미지를 안 보이도록
       
         delayedFetchActorImage(actorName);
@@ -343,7 +349,6 @@ const MovieList = (props) => {
             return;
         }
         
-        console.log(type, actorName);
         setActors(prev=>({
             ...prev,
             [type]:prev[type].map((t, i)=>{
@@ -359,11 +364,9 @@ const MovieList = (props) => {
     // 이미지 클릭 시 실행되는 함수
     const handleImageClick = (imageNo) => {
 
-        console.log('handleImageClick 실행');
         // setClickedActorInfo를 통해 저장한 type과 index 가져오기
         const { type, index } = clickedActorInfo;
         
-        // console.log('Type:', type, 'Index:', index);
         
         // 클릭한 이미지 번호를 이용하여 배우 번호 가져오는 axios 호출
         axios.get(`${process.env.REACT_APP_REST_API_URL}/actor/findActorNoByImageNo/${imageNo}`)
@@ -707,21 +710,23 @@ const MovieList = (props) => {
                                         {imageNo}
                                     </div>
                             ))} */}
-
-                            {actorImageNoList.map((imageNo) => (
-                                <div key={imageNo} >
-                                    
-                                    {/* 이미지를 렌더링하는 코드 수정 */}
-                                    {imageNo}
-                                    <img
+                            <div style={{ display: 'flex', flexDirection: 'row' }}>
+                                {actorImageNoList.slice(0,5).map((imageNo) => (
+                                    <div key={imageNo} style={{ marginRight: '10px' }}>
                                         
-                                        src={`${process.env.REACT_APP_REST_API_URL}/image/${imageNo}`}
-                                        alt={`이미지 ${imageNo}`}
-                                        className="img-fluid"
-                                        onClick={() => handleImageClick(imageNo)}
-                                    />
-                                </div>
-                            ))}
+                                        {/* 이미지를 렌더링하는 코드 수정 */}
+                                        {imageNo}
+                                        <img
+                                            
+                                            src={`${process.env.REACT_APP_REST_API_URL}/image/${imageNo}`}
+                                            alt={`이미지 ${imageNo}`}
+                                            className="img-fluid"
+                                            style={{ width: '100px', height: '100px' }}
+                                            onClick={() => handleImageClick(imageNo)}
+                                        />
+                                    </div>
+                                ))}
+                            </div>
 
 
 
@@ -737,7 +742,7 @@ const MovieList = (props) => {
                                                         type="text"
                                                         name="actorNoList"
                                                         value={actorList[index] || ''}
-                                                        onChange={(e) => handleActorChange(e, type, index)}
+                                                        onChange={(e) => handleActorChange(e, type, index)}                                                                                                              
                                                         className="form-control"
                                                         // ref={fileChooser}
                                                     />
