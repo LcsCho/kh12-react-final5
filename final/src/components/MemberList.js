@@ -9,7 +9,6 @@ import { MdOutlineClear } from "react-icons/md";
 import "./List.css";
 
 
-
 const MemberList = (props) => {
     const [memberList, setMemberList] = useState([]);
     const [editableMemberId, setEditableMemberId] = useState(null);
