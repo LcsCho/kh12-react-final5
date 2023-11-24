@@ -8,7 +8,6 @@ import { NavLink, useLocation } from "react-router-dom";
 import { MdOutlineClear } from "react-icons/md";
 import "./List.css";
 
-import { useState, useEffect } from "react";
 
 
 const MemberList = (props) => {
