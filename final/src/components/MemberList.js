@@ -5,6 +5,7 @@ import { LiaEdit } from "react-icons/lia";
 import { useState, useRef, useEffect } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import { MdOutlineClear } from "react-icons/md";
+import "./List.css";
 
 const MemberList = (props) => {
     const location = useLocation();
@@ -102,11 +103,12 @@ const MemberList = (props) => {
                             <tr>
                                 <th width="25%">아이디</th>
                                 <th width="15%">닉네임</th>
-                                <th width="15%">연락처</th>
-                                <th width="15%">생년월일</th>
-                                <th width="10%">가입일</th>
+                                <th className="pc-only" width="15%">연락처</th>
+                                <th className="pc-only" width="15%">생년월일</th>
+                                <th className="pc-only" width="10%">가입일</th>
                                 <th width="5%">성별</th>
                                 <th width="15%">등급</th>
+                                <th></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -134,7 +136,7 @@ const MemberList = (props) => {
                                                         <button className="btn btn-secondary btn-sm mt-2" onClick={handleCancelClick}>취소</button>
                                                 </div>
                                             ) : (
-                                                <div className="row mx-auto">
+                                                <div className="row me-2">
                                                     <button className="btn btn-danger" onClick={() => handleEditClick(member.memberId, member.memberLevel)}>{member.memberLevel}
                                                     </button>
                                                 </div>
