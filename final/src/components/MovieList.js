@@ -144,7 +144,7 @@ const MovieList = (props) => {
         if (choice === false) return;
 
         axios({
-            url: `${process.env.REACT_APP_REST_API_URL}/movie/${movie.movieNo}`,
+            url: `${process.env.REACT_APP_REST_API_URL}/movie/delete/${movie.movieNo}`,
             method: "delete",
         })
             .then((response) => {
@@ -213,7 +213,9 @@ const MovieList = (props) => {
                     },
                 }
             );
+            loadMovie();
             closeModal();
+            loadMovie();
         } catch (error) {
             console.error("에러 발생", error);
         }

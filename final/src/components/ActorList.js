@@ -273,7 +273,15 @@ const ActorList = (props) => {
                     actorName: actorName,
                 },
             });
-            setActorList(response.data);
+            // 각 배우에 대한 이미지를 불러오고 actorList를 업데이트
+            const updatedActorList = await Promise.all(response.data.map(async (actor) => {
+                const imageUrl = await loadActorImage(actor.actorNo);
+                return { ...actor, imageUrl };
+            }));
+
+
+
+            setActorList(updatedActorList);
 
         } catch (error) {
             console.error('검색 오류', error);
