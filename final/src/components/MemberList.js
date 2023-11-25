@@ -14,27 +14,23 @@ const MemberList = (props) => {
     const [editableMemberId, setEditableMemberId] = useState(null);
     const [editedMemberLevel, setEditedMemberLevel] = useState("");
 
+    //페이지네이션
     const [currentPage, setCurrentPage] = useState(1);
-    const [pageSize, setPageSize] = useState(15);
-    const [totalMembers, setTotalMembers] = useState(0);
-    const [startPage, setStartPage] = useState(1);
-
-    const totalPages = Math.ceil(totalMembers / pageSize);
-    const maxButtons = 10;
-
-    // 검색에 대한 페이지네이션을 위한 새로운 state 변수
     const [searchCurrentPage, setSearchCurrentPage] = useState(1);
+    const [pageSize, setPageSize] = useState(15);
     const [searchPageSize, setSearchPageSize] = useState(15);
-    const [searchTotalPages, setSearchTotalPages] = useState(0);
+    const [totalMembers, setTotalMembers] = useState(0);
     const [searchTotalMembers, setSearchTotalMembers] = useState(0);
+    const [startPage, setStartPage] = useState(1);
     const [searchStartPage, setSearchStartPage] = useState(1);
+    const [searchTotalPages, setSearchTotalPages] = useState(0);
     const [memberNickname, setMemberNickname] = useState('');
+    const maxButtons = 10;
     const searchMaxButtons = 10;
-
-    // 기존 검색 중 여부 확인을 통한 렌더링
+    const totalPages = Math.ceil(totalMembers / pageSize);
     const isSearching = !!memberNickname;
 
-
+    //회원 리스트 (페이지네이션 포함)
     const loadMember = async (page = currentPage, size = pageSize) => {
         const response = await axios({
             url: `${process.env.REACT_APP_REST_API_URL}/member/page/${currentPage}/size/${pageSize}`,
@@ -47,6 +43,7 @@ const MemberList = (props) => {
         setMemberList(response.data);
     };
 
+    //전체 회원수
     const loadTotalMembers = async () => {
         try {
             const response = await axios({
@@ -59,6 +56,7 @@ const MemberList = (props) => {
         }
     };
 
+    //현재 페이지 계산
     const handlePageChange = async (page) => {
         if (page >= 1 && page <= totalPages && page !== currentPage) {
             await loadMember(page);
@@ -66,6 +64,7 @@ const MemberList = (props) => {
         }
     };
 
+    //한 페이지 다음 버튼
     const handleNextButtonClick = () => {
         const nextPage = Math.min(totalPages, currentPage + 1);
 
@@ -76,6 +75,7 @@ const MemberList = (props) => {
         setCurrentPage(nextPage);
     };
 
+    //한 페이지 이전 버튼
     const handlePrevButtonClick = () => {
         const prevPage = Math.max(1, currentPage - 1);
 
@@ -86,9 +86,9 @@ const MemberList = (props) => {
         setCurrentPage(prevPage);
     };
 
+    //전체 리스트 네비게이터
     const renderPaginationButtons = () => {
         const buttons = [];
-
         const endPage = Math.min(startPage + maxButtons - 1, totalPages);
 
         for (let i = startPage; i <= endPage; i++) {
@@ -100,11 +100,10 @@ const MemberList = (props) => {
                 </li>
             );
         }
-
         return buttons;
     };
 
-    //검색
+    //회원 닉네임 검색 (페이지네이션 포함)
     const loadSearch = async (page = searchCurrentPage, size = searchPageSize) => {
         try {
             if (!memberNickname) {
@@ -127,6 +126,7 @@ const MemberList = (props) => {
         }
     };
 
+    //검색 회원수
     const loadSearchTotalMembers = async () => {
         try {
             const response = await axios({
@@ -142,13 +142,15 @@ const MemberList = (props) => {
         }
     };
 
+    //검색 페이지 계산
     const handleSearchPageChange = async (page) => {
         if (page >= 1 && page <= searchTotalPages && page !== searchCurrentPage) {
             await loadSearch(page);
             setSearchCurrentPage(page);
         }
     };
-
+    
+    //검색 한페이지 다음 버튼
     const handleSearchNextButtonClick = async () => {
         const nextPage = Math.min(searchTotalPages, searchCurrentPage + 1);
 
@@ -160,8 +162,7 @@ const MemberList = (props) => {
         setSearchCurrentPage(nextPage);
     };
 
-
-
+    //검색 한페이지 이전 버튼
     const handleSearchPrevButtonClick = async () => {
         const prevPage = Math.max(1, searchCurrentPage - 1);
 
@@ -173,6 +174,7 @@ const MemberList = (props) => {
         setSearchCurrentPage(prevPage);
     };
 
+    //검색 리스트 네비게이터
     const renderSearchPaginationButtons = () => {
         const buttons = [];
 
@@ -187,7 +189,6 @@ const MemberList = (props) => {
                 </li>
             );
         }
-
         return buttons;
     };
 
@@ -268,6 +269,42 @@ const MemberList = (props) => {
         }
     };
 
+    //연락처 Format
+    const formatPhoneNumber = (phoneNumber) => {
+        return phoneNumber.replace(/(\d{3})(\d{4})(\d{4})/, '$1-$2-$3');
+    };
+
+    const calculatePageRange = (currentPage, maxButtons, totalPages) => {
+        const halfMaxButtons = Math.floor(maxButtons / 2);
+        let startPage = Math.max(1, currentPage - halfMaxButtons);
+        let endPage = Math.min(totalPages, startPage + maxButtons - 1);
+    
+        if (endPage - startPage + 1 < maxButtons) {
+            startPage = Math.max(1, endPage - maxButtons + 1);
+        }
+    
+        return { startPage, endPage };
+    };
+
+    const renderRangeButtons = (currentPage, maxButtons, totalPages, handlePageChange) => {
+        const buttons = [];
+        const { startPage, endPage } = calculatePageRange(currentPage, maxButtons, totalPages);
+    
+        for (let i = startPage; i <= endPage; i++) {
+            buttons.push(
+                <li key={i} className={`page-item ${currentPage === i ? "active" : ""}`}>
+                    <button type="button" className="page-link" onClick={() => handlePageChange(i)}>
+                        {i}
+                    </button>
+                </li>
+            );
+        }
+    
+        return buttons;
+    };
+    
+    
+
     return (
         <>
             <h3 style={{ color: '#B33939', marginTop: '50px', marginBottom: '50px' }}>회원 목록</h3>
@@ -289,7 +326,7 @@ const MemberList = (props) => {
                 <div className="col text-center">
                     <table className="table table-hover">
                         <thead>
-                            <tr>
+                        <tr className="table-danger">
                                 <th width="25%">아이디</th>
                                 <th width="15%">닉네임</th>
                                 <th className="pc-only" width="15%">연락처</th>
@@ -305,9 +342,9 @@ const MemberList = (props) => {
                                 <tr key={index}>
                                     <td>{member.memberId}</td>
                                     <td>{member.memberNickname}</td>
-                                    <td  className="pc-only">{member.memberContact}</td>
-                                    <td  className="pc-only">{member.memberBirth}</td>
-                                    <td  className="pc-only">{member.memberJoin}</td>
+                                    <td className="pc-only">{formatPhoneNumber(member.memberContact)}</td>
+                                    <td className="pc-only">{member.memberBirth}</td>
+                                    <td className="pc-only">{member.memberJoin}</td>
                                     <td>{member.memberGender}</td>
                                     <td>
                                         <div className="row ms-2">
@@ -342,13 +379,13 @@ const MemberList = (props) => {
                             <ul className="pagination justify-content-center">
                                 <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
                                     <button type="button" className="page-link" onClick={handlePrevButtonClick}>
-                                        &laquo;
+                                        &lt;
                                     </button>
                                 </li>
                                 {renderPaginationButtons()}
                                 <li className={`page-item ${currentPage === totalPages ? "disabled" : ""}`}>
                                     <button type="button" className="page-link" onClick={handleNextButtonClick}>
-                                        &raquo;
+                                        &gt;
                                     </button>
                                 </li>
                             </ul>
@@ -359,13 +396,13 @@ const MemberList = (props) => {
                             <ul className="pagination justify-content-center">
                                 <li className={`page-item ${searchCurrentPage === 1 ? "disabled" : ""}`}>
                                     <button type="button" className="page-link" onClick={handleSearchPrevButtonClick}>
-                                        &laquo;
+                                        &lt;
                                     </button>
                                 </li>
                                 {renderSearchPaginationButtons()}
                                 <li className={`page-item ${searchCurrentPage === searchTotalPages ? "disabled" : ""}`}>
                                     <button type="button" className="page-link" onClick={handleSearchNextButtonClick}>
-                                        &raquo;
+                                        &gt;
                                     </button>
                                 </li>
                             </ul>

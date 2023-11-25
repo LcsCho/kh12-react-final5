@@ -12,12 +12,25 @@ const MovieList = (props) => {
     const [genreList, setGenreList] = useState([]);
     const [actorImageNoList, setActorImageNoList] = useState([]);//배우이미지번호 리스트
     const [clickedActorInfo, setClickedActorInfo] = useState({ type: null, index: null });
+    const [selectedMovie, setSelectedMovie] = useState(null);
     const fileChooser = useRef();
     const fileChoosers = useRef();
 
-
-
-    const [selectedMovie, setSelectedMovie] = useState(null);
+    //페이지네이션
+    const [currentPage, setCurrentPage] = useState(1);
+    const [searchCurrentPage, setSearchCurrentPage] = useState(1);
+    const [pageSize, setPageSize] = useState(15);
+    const [searchPageSize, setSearchPageSize] = useState(15);
+    const [startPage, setStartPage] = useState(1);
+    const [searchStartPage, setSearchStartPage] = useState(1);
+    const [searchTotalPages, setSearchTotalPages] = useState(0);
+    const [totalMovies, setTotalMovies] = useState(0);
+    const [searchTotalMovies, setSearchTotalMovies] = useState(0);
+    const [movieName, setMovieName] = useState('');
+    const maxButtons = 10;
+    const searchMaxButtons = 10;
+    const totalPages = Math.ceil(totalMovies / pageSize);
+    const isSearching = !!movieName;
 
     // const openMovieDetailsModal = (movie) => {
     //     setSelectedMovie(movie);
@@ -38,9 +51,7 @@ const MovieList = (props) => {
         actorRoleList: "",
     });
 
-
-
-    // 장르, 배우, 갤러리 이미지 닫기 버튼 구현
+    // 장르, 배우, 갤러리 이미지 닫기 버튼
     const removeGenreInput = (index) => {
         setGenres((prevGenres) => prevGenres.filter((_, i) => i !== index));
     };
@@ -60,13 +71,75 @@ const MovieList = (props) => {
         });
     };
 
-
-    const loadMovie = async () => {
+    //영화 리스트 (페이지네이션 포함)
+    const loadMovie = async (page = currentPage, size = pageSize) => {
         const response = await axios({
-            url: `${process.env.REACT_APP_REST_API_URL}/movie/adminMovieList`,
+            url: `${process.env.REACT_APP_REST_API_URL}/movie/page/${currentPage}/size/${pageSize}`,
             method: "get",
+            params: {
+                page: currentPage,
+                size: pageSize,
+            },
         });
         setMovieList(response.data);
+    };
+
+    //전체 영화수
+    const loadTotalMovies = async () => {
+        try {
+            const response = await axios({
+                url: `${process.env.REACT_APP_REST_API_URL}/movie/movieListCount`,
+                method: "get",
+            });
+            setTotalMovies(response.data);
+        } catch (error) {
+            console.error("전체 영화 수를 불러오는 중 오류 발생:", error);
+        }
+    };
+
+    //현재 페이지 계산
+    const handlePageChange = async (page) => {
+        if (page >= 1 && page <= totalPages && page !== currentPage) {
+            await loadMovie(page);
+            setCurrentPage(page);
+        }
+    };
+
+    //한 페이지 다음 버튼
+    const handleNextButtonClick = () => {
+        const nextPage = Math.min(totalPages, currentPage + 1);
+
+        if (nextPage > startPage + maxButtons - 1) {
+            setStartPage(startPage + maxButtons);
+        }
+        setCurrentPage(nextPage);
+    };
+
+    //한 페이지 이전 버튼
+    const handlePrevButtonClick = () => {
+        const prevPage = Math.max(1, currentPage - 1);
+
+        if (prevPage < startPage) {
+            setStartPage(Math.max(1, startPage - maxButtons));
+        }
+        setCurrentPage(prevPage);
+    };
+
+    //전체 리스트 네비게이터
+    const renderPaginationButtons = () => {
+        const buttons = [];
+        const endPage = Math.min(startPage + maxButtons - 1, totalPages);
+
+        for (let i = startPage; i <= endPage; i++) {
+            buttons.push(
+                <li key={i} className={`page-item ${currentPage === i ? "active" : ""}`}>
+                    <button type="button" className="page-link" onClick={() => handlePageChange(i)}>
+                        {i}
+                    </button>
+                </li>
+            );
+        }
+        return buttons;
     };
 
     const changeMovie = (e) => {
@@ -96,6 +169,7 @@ const MovieList = (props) => {
             }
         });
     };
+
     const clearMovie = () => {
         setMovie({
             movieImage: null,
@@ -111,7 +185,6 @@ const MovieList = (props) => {
             actorNoList: "",
             actorRoleList: "",
         });
-
 
         clearMovieImage();
         clearMovieImages();
@@ -152,7 +225,6 @@ const MovieList = (props) => {
             })
             .catch((err) => { });
     };
-
 
     const saveMovie = async () => {
         try {
@@ -221,8 +293,6 @@ const MovieList = (props) => {
         }
     };
 
-
-
     // 장르 불러오기
     const loadGenre = async () => {
         const response = await axios({
@@ -232,13 +302,26 @@ const MovieList = (props) => {
         setGenreList(response.data);
     }
 
-
+    // useEffect(() => {
+    //     loadSearch();
+    //     loadMovie();
+    //     loadGenre();
+    // },[]);
 
     useEffect(() => {
-        loadSearch();
-        loadMovie();
-        loadGenre();
-    },[]);
+        // 검색이 아닐 때 전체 회원 리스트 데이터 로드
+        if (!movieName) {
+            loadMovie();
+            loadTotalMovies();
+            loadGenre();
+        }
+        // 검색일 때 검색한 회원 리스트 데이터 로드
+        else {
+            // loadSearch();
+            loadSearchTotalMovies();
+            loadGenre();
+        }
+    }, [currentPage, pageSize, searchCurrentPage, searchPageSize, movieName]);
 
 
     // 모달 세팅
@@ -258,7 +341,6 @@ const MovieList = (props) => {
     // 장르 세팅
     const [genres, setGenres] = useState([{ genreName: '' }]);
 
-
     const addGenreInput = () => {
         setGenres((prevGenres) => [
             ...prevGenres,
@@ -276,6 +358,7 @@ const MovieList = (props) => {
         우정출연: [],
         성우: [],
     });
+
     // 섹션 확장 여부를 추적하는 상태
     const [expandedSections, setExpandedSections] = useState({
         주연: false,
@@ -311,7 +394,7 @@ const MovieList = (props) => {
         //입력창에 아무것도 없으면 axios통신 안보냄
         if (!actorName) {
             return;
-        }  
+        }
         try {
             const response = await axios.get(
                 `${process.env.REACT_APP_REST_API_URL}/actor/findImageNoByActorName/${actorName}`
@@ -328,31 +411,26 @@ const MovieList = (props) => {
     // 배우 입력 값 변경 함수
     const handleActorChange = async(e, type, index) => {
 
-
         const actorName = e.target.value;
         // 값이 비어있을 때 이미지를 안 보이도록
-      
         delayedFetchActorImage(actorName);
-
 
         // 이미지 클릭 시 해당 배우 정보를 전달하기 위해 type과 index를 저장
         setClickedActorInfo({ type, index });
 
-        
         const updatedActors = { ...actors };
         updatedActors[type][index] = actorName;
         setActors(updatedActors);
-        
-        console.log(actorImageNoList);
-        if (actorName =="") {
+
+        //console.log(actorImageNoList);
+        if (actorName == "") {
             setActorImageNoList([]);
             return;
         }
-        
         setActors(prev=>({
             ...prev,
-            [type]:prev[type].map((t, i)=>{
-                if(i === index) {
+            [type]: prev[type].map((t, i) => {
+                if (i === index) {
                     return actorName;
                 }
                 return t;
@@ -378,17 +456,16 @@ const MovieList = (props) => {
                 const updatedActors = { ...actors };
                 updatedActors[type][index] = actorNo;
                 setActors(updatedActors);
-                
+
                 setActors((prev) => ({
                     ...prev,
                     [type]: prev[type].map((t, i) => (i === index ? actorNo : t)),
-                })); 
-                
-            // // 이미지 리스트 초기화
+                }));
 
-            setActorImageNoList([]);
-            // 클릭 정보 초기화
-            setClickedActorInfo({ type: null, index: null });                
+                // // 이미지 리스트 초기화
+                setActorImageNoList([]);
+                // 클릭 정보 초기화
+                setClickedActorInfo({ type: null, index: null });
 
             })
             .catch((error) => {
@@ -417,14 +494,11 @@ const MovieList = (props) => {
                 ...prevMovie,
                 movieImage: null,
             }));
-
         }
     };
 
-
     // 갤러리 이미지 상태
     const [galleryImages, setGalleryImages] = useState([{ file: null, preview: null }]);
-
 
     // 갤러리 이미지 추가 함수
     const addGalleryImageInput = () => {
@@ -496,21 +570,111 @@ const MovieList = (props) => {
         setGalleryImages({ file: null, preview: null });
     };
 
-    // 영화 제목 검색 코드
-    const [movieName, setMovieName] = useState('');
-    const loadSearch = async () => {
+    //영화 제목 검색 (페이지네이션 포함)
+    const loadSearch = async (page = searchCurrentPage, size = searchPageSize) => {
         try {
+            if (!movieName) {
+                // 검색어가 없으면 처리를 중단하거나 초기 상태로 돌아갈 수 있습니다.
+                return;
+            }
+
             const response = await axios({
-                url: `${process.env.REACT_APP_REST_API_URL}/movie/adminSearch/${movieName}`,
+                url: `${process.env.REACT_APP_REST_API_URL}/movie/adminSearch/${movieName}/page/${page}/size/${size}`,
                 method: "get",
                 params: {
                     movieName: movieName,
+                    page: page,
+                    size: size,
                 },
             });
             setMovieList(response.data);
-
         } catch (error) {
             console.error('검색 오류', error);
+        }
+    };
+
+    //검색 영화수
+    const loadSearchTotalMovies = async () => {
+        try {
+            const response = await axios({
+                url: `${process.env.REACT_APP_REST_API_URL}/movie/searchCount/${movieName}`,
+                method: "get",
+                params: {
+                    movieName: movieName
+                },
+            });
+            setSearchTotalPages(Math.ceil(response.data / pageSize));
+        } catch (error) {
+            console.error("검색된 영화 수를 불러오는 중 오류 발생:", error);
+        }
+    };
+
+    //검색 현재 페이지
+    const handleSearchPageChange = async (page) => {
+        if (page >= 1 && page <= searchTotalPages && page !== searchCurrentPage) {
+            await loadSearch(page);
+            setSearchCurrentPage(page);
+        }
+    };
+
+    //검색 1페이지 다음 버튼
+    const handleSearchNextButtonClick = async () => {
+        const nextPage = Math.min(searchTotalPages, searchCurrentPage + 1);
+
+        if (nextPage > searchStartPage + searchMaxButtons - 1) {
+            setSearchStartPage(searchStartPage + searchMaxButtons);
+        }
+
+        await loadSearch(nextPage);
+        setSearchCurrentPage(nextPage);
+    };
+
+    //검색 1 페이지 이전 버튼
+    const handleSearchPrevButtonClick = async () => {
+        const prevPage = Math.max(1, searchCurrentPage - 1);
+
+        if (prevPage < searchStartPage) {
+            setSearchStartPage(Math.max(1, searchStartPage - searchMaxButtons));
+        }
+
+        await loadSearch(prevPage);
+        setSearchCurrentPage(prevPage);
+    };
+
+    //검색 네비게이터
+    const renderSearchPaginationButtons = () => {
+        const buttons = [];
+        const endPage = Math.min(searchStartPage + searchMaxButtons - 1, searchTotalPages);
+
+        for (let i = searchStartPage; i <= endPage; i++) {
+            buttons.push(
+                <li key={i} className={`page-item ${searchCurrentPage === i ? "active" : ""}`}>
+                    <button type="button" className="page-link" onClick={() => handleSearchPageChange(i)}>
+                        {i}
+                    </button>
+                </li>
+            );
+        }
+        return buttons;
+    };
+
+    // 검색어 입력 이벤트 핸들러
+    const handleSearchInputChange = (e) => {
+        setMovieName(e.target.value);
+    };
+
+    // 검색 버튼 클릭 이벤트 핸들러
+    const handleSearchButtonClick = async () => {
+        setSearchStartPage(1)
+        setSearchCurrentPage(1);
+        await loadSearch(1);
+        await loadSearchTotalMovies();
+    };
+
+    // Enter 키 입력 이벤트 핸들러
+    const handleSearchInputKeyPress = (e) => {
+        if (e.key === 'Enter') {
+            handleSearchButtonClick();
         }
     };
 
@@ -522,36 +686,35 @@ const MovieList = (props) => {
                     type="text"
                     placeholder="영화 제목을 입력하여 검색"
                     value={movieName}
-                    onChange={(e) => setMovieName(e.target.value)}
+                    onChange={handleSearchInputChange}
+                    onKeyPress={handleSearchInputKeyPress}
                     className="form-control me-2"
-                    style={{width:'700px'}}
+                    style={{ width: '400px' }}
                 />
-                <button className="btn btn-danger h-100" onClick={loadSearch} style={{lineHeight:"2"}}>
+                <button className="btn btn-danger h-100" onClick={handleSearchButtonClick} style={{ lineHeight: "2" }}>
                     검색
                 </button>
             </div>
             <div className="text-end">
-                <button className="btn btn-danger" onClick={openModal} style={{ marginTop: '50px'}}>
+                <button className="btn btn-danger" onClick={openModal} style={{ marginTop: '50px' }}>
                     <AiOutlineUnorderedList />영화 등록
                 </button>
             </div>
 
             <div className="row mt-4" >
 
-
-
                 <div className="col text-center">
                     <table className="table table-hover">
                         <thead>
-                            <tr>
+                            <tr className="table-danger">
                                 <th width="5%">번호</th>
-                                <th width="20%">제목</th>
-                                <th width="15%">감독</th>
+                                <th width="25%">제목</th>
+                                <th width="10%">감독</th>
                                 <th width="10%">개봉일</th>
-                                <th width="15%">장르</th>
+                                <th width="25%">장르</th>
                                 <th width="5%">국가</th>
-                                <th width="20%">출연진</th>
-                                <th width="10%">관리</th>
+                                <th width="15%">출연진</th>
+                                <th width="5%">관리</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -576,7 +739,7 @@ const MovieList = (props) => {
                                     <td>
                                         <div className="row">
                                             <div>
-                                                <MdOutlineClear className="text-danger" style={{fontSize:'30px'}}onClick={(e) => deleteMovie(movie)} />
+                                                <MdOutlineClear className="text-danger" style={{ fontSize: '30px' }} onClick={(e) => deleteMovie(movie)} />
                                             </div>
                                         </div>
                                     </td>
@@ -584,6 +747,41 @@ const MovieList = (props) => {
                             ))}
                         </tbody>
                     </table>
+                    <div>
+                        {/* 전체 리스트일 때만 네비게이터 렌더링 */}
+                        {!isSearching && (
+                            <ul className="pagination justify-content-center">
+                                <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
+                                    <button type="button" className="page-link" onClick={handlePrevButtonClick}>
+                                        &lt;
+                                    </button>
+                                </li>
+                                {renderPaginationButtons()}
+                                <li className={`page-item ${currentPage === totalPages ? "disabled" : ""}`}>
+                                    <button type="button" className="page-link" onClick={handleNextButtonClick}>
+                                        &gt;
+                                    </button>
+                                </li>
+                            </ul>
+                        )}
+
+                        {/* 검색 중일 때만 네비게이터 렌더링 */}
+                        {isSearching && (
+                            <ul className="pagination justify-content-center">
+                                <li className={`page-item ${searchCurrentPage === 1 ? "disabled" : ""}`}>
+                                    <button type="button" className="page-link" onClick={handleSearchPrevButtonClick}>
+                                        &lt;
+                                    </button>
+                                </li>
+                                {renderSearchPaginationButtons()}
+                                <li className={`page-item ${searchCurrentPage === searchTotalPages ? "disabled" : ""}`}>
+                                    <button type="button" className="page-link" onClick={handleSearchNextButtonClick}>
+                                        &gt;
+                                    </button>
+                                </li>
+                            </ul>
+                        )}
+                    </div>
                 </div>
             </div>
 
@@ -710,6 +908,7 @@ const MovieList = (props) => {
                                         {imageNo}
                                     </div>
                             ))} */}
+                            
                             <div style={{ display: 'flex', flexDirection: 'row' }}>
                                 {actorImageNoList.slice(0,5).map((imageNo) => (
                                     <div key={imageNo} style={{ marginRight: '10px' }}>
@@ -728,8 +927,6 @@ const MovieList = (props) => {
                                 ))}
                             </div>
 
-
-
                             {/* 배우 번호로 등록 */}
                             <div className="row mt-4">
                                 {Object.entries(actors).map(([type, actorList]) => (
@@ -744,7 +941,7 @@ const MovieList = (props) => {
                                                         value={actorList[index] || ''}
                                                         onChange={(e) => handleActorChange(e, type, index)}                                                                                                              
                                                         className="form-control"
-                                                        // ref={fileChooser}
+                                                    // ref={fileChooser}
                                                     />
                                                     <button
                                                         className="btn btn-danger mt-2"
@@ -762,7 +959,7 @@ const MovieList = (props) => {
                                             </button>
                                         </div>
                                     </div>
-                                    
+
                                 ))}
                             </div>
 

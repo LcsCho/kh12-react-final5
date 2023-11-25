@@ -7,15 +7,94 @@ const ReviewList = (props) => {
     const location = useLocation();
     const [reviewList, setReviewList] = useState([]);
 
-    const loadReview = async () => {
-        try {
-            const response = await axios.get(`${process.env.REACT_APP_REST_API_URL}/review/adminReviewList`);
-            setReviewList(response.data);
-        } catch (error) {
-            console.error("에러 발생", error);
-        }
-    }
+    const [currentPage, setCurrentPage] = useState(1);
+    const [pageSize, setPageSize] = useState(15);
+    const [totalReviews, setTotalReviews] = useState(0);
+    const [startPage, setStartPage] = useState(1);
+    const totalPages = Math.ceil(totalReviews / pageSize);
+    const maxButtons = 10;
 
+    // const loadReview = async (page = currentPage, size = pageSize) => {
+    //     try {
+    //         const response = await axios.get(`${process.env.REACT_APP_REST_API_URL}/review/adminReviewList`);
+    //         setReviewList(response.data);
+    //     } catch (error) {
+    //         console.error("에러 발생", error);
+    //     }
+    // }
+
+    //전체 리뷰 리스트
+    const loadReview = async (page = currentPage, size = pageSize) => {
+        const response = await axios({
+            url: `${process.env.REACT_APP_REST_API_URL}/review/page/${currentPage}/size/${pageSize}`,
+            method: "get",
+            params: {
+                page: currentPage,
+                size: pageSize,
+            },
+        });
+        setReviewList(response.data);
+    };
+    
+    //전체 리뷰수
+    const loadTotalReviews = async () => {
+        try {
+            const response = await axios({
+                url: `${process.env.REACT_APP_REST_API_URL}/review/reviewCount`,
+                method: "get",
+            });
+            setTotalReviews(response.data);
+        } catch (error) {
+            console.error("전체 리뷰 수를 불러오는 중 오류 발생:", error);
+        }
+    };
+
+    //현재 페이지 계산
+    const handlePageChange = async (page) => {
+        if (page >= 1 && page <= totalPages && page !== currentPage) {
+            await loadReview(page);
+            setCurrentPage(page);
+        }
+    };
+
+    //다음 버튼
+    const handleNextButtonClick = () => {
+        const nextPage = Math.min(totalPages, currentPage + 1);
+
+        if (nextPage > startPage + maxButtons - 1) {
+            setStartPage(startPage + maxButtons);
+        }
+        setCurrentPage(nextPage);
+    };
+
+    //이전 버튼
+    const handlePrevButtonClick = () => {
+        const prevPage = Math.max(1, currentPage - 1);
+
+        if (prevPage < startPage) {
+            setStartPage(Math.max(1, startPage - maxButtons));
+        }
+        setCurrentPage(prevPage);
+    };
+
+    //네비게이터
+    const renderPaginationButtons = () => {
+        const buttons = [];
+        const endPage = Math.min(startPage + maxButtons - 1, totalPages);
+
+        for (let i = startPage; i <= endPage; i++) {
+            buttons.push(
+                <li key={i} className={`page-item ${currentPage === i ? "active" : ""}`}>
+                    <button type="button" className="page-link" onClick={() => handlePageChange(i)}>
+                        {i}
+                    </button>
+                </li>
+            );
+        }
+        return buttons;
+    };
+
+    //리뷰 삭제
     const deleteReview = (review) => {
         const choice = window.confirm("정말 삭제하시겠습니까?");
         if (choice === false) return;
@@ -29,9 +108,11 @@ const ReviewList = (props) => {
             })
             .catch(err => { });
     }
+
     useEffect(() => {
         loadReview();
-    }, []);
+        loadTotalReviews();
+    }, [currentPage, pageSize]);
 
     return (
         <>
@@ -41,7 +122,7 @@ const ReviewList = (props) => {
                 <div className="col text-center">
                     <table className="table table-hover">
                         <thead>
-                            <tr>
+                            <tr className="table-danger">
                                 <th width="20%">영화 제목</th>
                                 <th width="10%">리뷰 번호</th>
                                 <th width="15%">작성자</th>
@@ -69,6 +150,23 @@ const ReviewList = (props) => {
                             ))}
                         </tbody>
                     </table>
+
+                    <div>
+                        <ul className="pagination justify-content-center">
+                            <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
+                                <button type="button" className="page-link" onClick={handlePrevButtonClick}>
+                                    &laquo;
+                                </button>
+                            </li>
+                            {renderPaginationButtons()}
+                            <li className={`page-item ${currentPage === totalPages ? "disabled" : ""}`}>
+                                <button type="button" className="page-link" onClick={handleNextButtonClick}>
+                                    &raquo;
+                                </button>
+                            </li>
+                        </ul>
+                    </div>
+
                 </div>
             </div>
         </>
