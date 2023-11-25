@@ -13,11 +13,31 @@ const ActorList = (props) => {
 
     const fileChooser = useRef();
 
-    const loadActor = async () => {
+    const [currentPage, setCurrentPage] = useState(1);
+    const [pageSize, setPageSize] = useState(10);
+    const [totalActors, setTotalActors] = useState(0);
+    const [startPage, setStartPage] = useState(1);
+    
+    const [searchCurrentPage, setSearchCurrentPage] = useState(1);
+    const [searchPageSize, setSearchPageSize] = useState(10);
+    const [searchTotalPages, setSearchTotalPages] = useState(0);
+    const [searchTotalActors, setSearchTotalActors] = useState(0);
+    const [searchStartPage, setSearchStartPage] = useState(1);
+    const [actorName, setActorName] = useState('');
+    const totalPages = Math.ceil(totalActors / pageSize);
+    const maxButtons = 10;
+    const searchMaxButtons = 10;
+    const isSearching = !!actorName;
+
+    const loadActor = async (page = currentPage, size = pageSize) => {
         try {
             const response = await axios({
-                url: `${process.env.REACT_APP_REST_API_URL}/actor/`,
+                url: `${process.env.REACT_APP_REST_API_URL}/actor/page/${currentPage}/size/${pageSize}`,
                 method: "get",
+                params: {
+                    page: currentPage,
+                    size: pageSize,
+                },
             });
 
             // 각 배우에 대한 이미지를 불러오고 actorList를 업데이트
@@ -25,12 +45,12 @@ const ActorList = (props) => {
                 const imageUrl = await loadActorImage(actor.actorNo);
                 return { ...actor, imageUrl };
             }));
-
             setActorList(updatedActorList);
         } catch (error) {
             console.error("오류남", error);
         }
     };
+
     const loadActorImage = async (actorNo) => {
         try {
             const imageResponse = await axios({
@@ -52,10 +72,61 @@ const ActorList = (props) => {
         }
     };
 
-    useEffect(() => {
-        loadActor();
-        loadSearch();
-    }, []);
+    const loadTotalActors = async () => {
+        try {
+            const response = await axios({
+                url: `${process.env.REACT_APP_REST_API_URL}/actor/actorCount`,
+                method: "get",
+            });
+            setTotalActors(response.data);
+        } catch (error) {
+            console.error("전체 배우 수를 불러오는 중 오류 발생:", error);
+        }
+    };
+
+    const handlePageChange = async (page) => {
+        if (page >= 1 && page <= totalPages && page !== currentPage) {
+            await loadActor(page);
+            setCurrentPage(page);
+        }
+    };
+
+    const handlePrevButtonClick = () => {
+        const prevPage = Math.max(1, currentPage - 1);
+
+        if (prevPage < startPage) {
+            setStartPage(Math.max(1, startPage - maxButtons));
+        }
+
+        setCurrentPage(prevPage);
+    };
+
+    const handleNextButtonClick = () => {
+        const nextPage = Math.min(totalPages, currentPage + 1);
+
+        if (nextPage > startPage + maxButtons - 1) {
+            setStartPage(startPage + maxButtons);
+        }
+
+        setCurrentPage(nextPage);
+    };
+
+    const renderPaginationButtons = () => {
+        const buttons = [];
+        const endPage = Math.min(startPage + maxButtons - 1, totalPages);
+
+        for (let i = startPage; i <= endPage; i++) {
+            buttons.push(
+                <li key={i} className={`page-item ${currentPage === i ? "active" : ""}`}>
+                    <button type="button" className="page-link" onClick={() => handlePageChange(i)}>
+                        {i}
+                    </button>
+                </li>
+            );
+        }
+        return buttons;
+    };
+
     // 모달 세팅
     const bsModal = useRef();
     const openModal = () => {
@@ -87,7 +158,6 @@ const ActorList = (props) => {
         //모달에서 입력했을 때  값을 받을 부분
         actorName: "",
         actorImage: null, // 파일 선택을 위한 상태
-
     });
 
     const clearActor = () => {
@@ -137,8 +207,6 @@ const ActorList = (props) => {
             // 등록 후 목록을 다시 불러오기
             loadActor();
             closeModal(); // 모달 닫기
-
-
         } catch (error) {
             console.error("Failed to save actor:", error);
         }
@@ -153,7 +221,6 @@ const ActorList = (props) => {
         const selectedFile = event.target.files[0];
 
         if (selectedFile) {
-
             // 선택된 파일이 있을 경우 파일 정보를 저장
             setActor({
                 ...actor,
@@ -178,7 +245,6 @@ const ActorList = (props) => {
     };
 
     //수정
-
     const editActor = async (target) => {
         // 배우 정보를 모달에 표시하기 전에 불러오기
         const { actorNo } = target;
@@ -188,6 +254,7 @@ const ActorList = (props) => {
         loadActorDetails(actorNo);
         openModal();
     };
+
     const loadActorDetails = async (actorNo) => {
         try {
             // 배우 정보를 불러오는 API 호출
@@ -203,7 +270,6 @@ const ActorList = (props) => {
                 // 원하는 처리를 여기에 추가 (예: 에러 메시지 표시 등)
                 return;
             }
-
 
             // 이미지 정보를 불러오는 API 호출
             const imageResponse = await axios({
@@ -262,15 +328,20 @@ const ActorList = (props) => {
         }
     };
 
-    // 배우 이름 검색 코드
-    const [actorName, setActorName] = useState('');
-    const loadSearch = async () => {
+    // 배우 이름 검색 (페이지네이션 포함)
+    const loadSearch = async (page = searchCurrentPage, size = searchPageSize) => {
         try {
+            if (!actorName) {
+                // 검색어가 없으면 처리를 중단하거나 초기 상태로 돌아갈 수 있습니다.
+                return;
+            }
             const response = await axios({
-                url: `${process.env.REACT_APP_REST_API_URL}/actor/adminSearch/${actorName}`,
+                url: `${process.env.REACT_APP_REST_API_URL}/actor/adminSearch/${actorName}/page/${page}/size/${size}`,
                 method: "get",
                 params: {
                     actorName: actorName,
+                    page: page,
+                    size: size,
                 },
             });
             // 각 배우에 대한 이미지를 불러오고 actorList를 업데이트
@@ -278,13 +349,107 @@ const ActorList = (props) => {
                 const imageUrl = await loadActorImage(actor.actorNo);
                 return { ...actor, imageUrl };
             }));
-
-
-
             setActorList(updatedActorList);
-
         } catch (error) {
             console.error('검색 오류', error);
+        }
+    };
+
+    const loadSearchTotalActors = async () => {
+        try {
+            const response = await axios({
+                url: `${process.env.REACT_APP_REST_API_URL}/actor/searchCount/${actorName}`,
+                method: "get",
+                params: {
+                    actorName: actorName
+                },
+            });
+            setSearchTotalPages(Math.ceil(response.data / pageSize));
+        } catch (error) {
+            console.error("검색된 배우 수를 불러오는 중 오류 발생:", error);
+        }
+    };
+
+    const handleSearchPageChange = async (page) => {
+        if (page >= 1 && page <= searchTotalPages && page !== searchCurrentPage) {
+            await loadSearch(page);
+            setSearchCurrentPage(page);
+        }
+    };
+
+    const handleSearchNextButtonClick = async () => {
+        const nextPage = Math.min(searchTotalPages, searchCurrentPage + 1);
+
+        if (nextPage > searchStartPage + searchMaxButtons - 1) {
+            setSearchStartPage(searchStartPage + searchMaxButtons);
+        }
+
+        await loadSearch(nextPage);
+        setSearchCurrentPage(nextPage);
+    };
+
+    const handleSearchPrevButtonClick = async () => {
+        const prevPage = Math.max(1, searchCurrentPage - 1);
+
+        if (prevPage < searchStartPage) {
+            setSearchStartPage(Math.max(1, searchStartPage - searchMaxButtons));
+        }
+
+        await loadSearch(prevPage);
+        setSearchCurrentPage(prevPage);
+    };
+
+    const renderSearchPaginationButtons = () => {
+        const buttons = [];
+        const endPage = Math.min(searchStartPage + searchMaxButtons - 1, searchTotalPages);
+
+        for (let i = searchStartPage; i <= endPage; i++) {
+            buttons.push(
+                <li key={i} className={`page-item ${searchCurrentPage === i ? "active" : ""}`}>
+                    <button type="button" className="page-link" onClick={() => handleSearchPageChange(i)}>
+                        {i}
+                    </button>
+                </li>
+            );
+        }
+        return buttons;
+    };
+
+    // useEffect(() => {
+    //     loadActor();
+    //     loadSearch();
+    // }, []);
+
+    useEffect(() => {
+        // 검색이 아닐 때 전체 배우 리스트 데이터 로드
+        if (!actorName) {
+            loadActor();
+            loadTotalActors();
+        }
+        // 검색일 때 검색한 배우 리스트 데이터 로드
+        else {
+            // loadSearch();
+            loadSearchTotalActors();
+        }
+    }, [currentPage, pageSize, searchCurrentPage, searchPageSize, actorName]);
+
+    // 검색어 입력 이벤트 핸들러
+    const handleSearchInputChange = (e) => {
+        setActorName(e.target.value);
+    };
+
+    // 검색 버튼 클릭 이벤트 핸들러
+    const handleSearchButtonClick = async () => {
+        setSearchStartPage(1)
+        setSearchCurrentPage(1);
+        await loadSearch(1);
+        await loadSearchTotalActors();
+    };
+
+    // Enter 키 입력 이벤트 핸들러
+    const handleSearchInputKeyPress = (e) => {
+        if (e.key === 'Enter') {
+            handleSearchButtonClick();
         }
     };
 
@@ -294,17 +459,18 @@ const ActorList = (props) => {
             <div className="text-center mt-3 d-flex align-items-center justify-content-center mx-auto">
                 <input
                     type="text"
-                    placeholder="배우이름을 입력하여 검색"
+                    placeholder="배우 이름을 입력하여 검색"
                     value={actorName}
-                    onChange={(e) => setActorName(e.target.value)}
+                    onChange={handleSearchInputChange}
+                    onKeyPress={handleSearchInputKeyPress}
                     className="form-control me-2"
-                    style={{width:'700px'}}
+                    style={{ width: '400px' }}
                 />
-                <button className="btn btn-danger h-100" onClick={loadSearch} style={{lineHeight:"2"}}>
+                <button className="btn btn-danger h-100" onClick={handleSearchButtonClick} style={{ lineHeight: "2" }}>
                     검색
                 </button>
             </div>
-            <div className="text-end" style={{ marginTop: '50px'}}>
+            <div className="text-end" style={{ marginTop: '50px' }}>
                 <button className="btn btn-danger" onClick={openModal}>
                     <AiOutlineUnorderedList />배우 등록
                 </button>
@@ -312,23 +478,18 @@ const ActorList = (props) => {
 
             <div className="row mt-4" >
 
-
-
                 <div className="col text-center">
                     <table className="table table-hover">
                         <thead>
-                            <tr>
-                                <th width="10%">번호</th>
+                            <tr className="table-danger">
                                 <th width="20%">이름</th>
-                                <th width="60%">이미지</th>
-                                <th width="10%">관리</th>
-
+                                <th width="65%">이미지</th>
+                                <th width="15%">관리</th>
                             </tr>
                         </thead>
                         <tbody>
                             {actorList.map((actor, index) => (
                                 <tr key={index}>
-                                    <td>{actor.actorNo}</td>
                                     <td>{actor.actorName}</td>
                                     <td>
                                         {actor.imageUrl ? (
@@ -338,20 +499,20 @@ const ActorList = (props) => {
                                                 style={{ maxWidth: "100px", maxHeight: "100px" }}
                                             />
                                         ) : (
-                                            <FaUser style={{maxWidth: "100px", maxHeight: "100px", marginTop:"12px"}}/>
+                                            <FaUser style={{ maxWidth: "100px", maxHeight: "100px", marginTop: "12px" }} />
                                         )}
                                     </td>
                                     <td>
                                         <div className="d-flex container-fluid">
-                                            <div style={{ fontSize: "25px" }}>
+                                            <div className="w-100" style={{ fontSize: "25px" }}>
                                                 <LiaEdit className="text-warning ms-2"
                                                     onClick={(e) => editActor(actor)}
                                                 />
                                             </div>
-                                            <div>
+                                            <div className="w-100">
                                                 <MdOutlineClear
                                                     className="text-danger ms-2"
-                                                    style={{ fontSize: "25px", marginTop:"9px" }}
+                                                    style={{ fontSize: "25px", marginTop: "9px" }}
                                                     onClick={(e) => deleteActor(actor)}
                                                 />
                                             </div>
@@ -361,6 +522,43 @@ const ActorList = (props) => {
                             ))}
                         </tbody>
                     </table>
+
+                    <div className="mt-3">
+                        {/* 전체 리스트일 때만 네비게이터 렌더링 */}
+                        {!isSearching && (
+                            <ul className="pagination justify-content-center">
+                                <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
+                                    <button type="button" className="page-link" onClick={handlePrevButtonClick}>
+                                        &lt;
+                                    </button>
+                                </li>
+                                {renderPaginationButtons()}
+                                <li className={`page-item ${currentPage === totalPages ? "disabled" : ""}`}>
+                                    <button type="button" className="page-link" onClick={handleNextButtonClick}>
+                                        &gt;
+                                    </button>
+                                </li>
+                            </ul>
+                        )}
+
+                        {/* 검색 중일 때만 네비게이터 렌더링 */}
+                        {isSearching && (
+                            <ul className="pagination justify-content-center">
+                                <li className={`page-item ${searchCurrentPage === 1 ? "disabled" : ""}`}>
+                                    <button type="button" className="page-link" onClick={handleSearchPrevButtonClick}>
+                                        &lt;
+                                    </button>
+                                </li>
+                                {renderSearchPaginationButtons()}
+                                <li className={`page-item ${searchCurrentPage === searchTotalPages ? "disabled" : ""}`}>
+                                    <button type="button" className="page-link" onClick={handleSearchNextButtonClick}>
+                                        &gt;
+                                    </button>
+                                </li>
+                            </ul>
+                        )}
+                    </div>
+
                 </div>
             </div>
 
