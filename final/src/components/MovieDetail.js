@@ -16,7 +16,7 @@ const MovieDetail = (props) => {
 
     const loadMovie = async () => {
         try {
-            const response = await axios.get(`${process.env.REACT_APP_REST_API_URL}/movie/movieNo/${movieNo}`);
+            const response = await axios.get(`${process.env.REACT_APP_REST_API_URL}/rest/movie/movieNo/${movieNo}`);
             setMovie(response.data);
         } catch (error) {
             console.error("에러 발생", error);
@@ -25,7 +25,7 @@ const MovieDetail = (props) => {
 
     const loadMovieActorRole = async () => {
         try {
-            const response = await axios.get(`${process.env.REACT_APP_REST_API_URL}/movie/actorInfoList/${movieNo}`);
+            const response = await axios.get(`${process.env.REACT_APP_REST_API_URL}/rest/movie/actorInfoList/${movieNo}`);
             setMovieActorRole(response.data);
             console.log(response.data);
         } catch (error) {
@@ -35,7 +35,7 @@ const MovieDetail = (props) => {
 
     const loadMovieGenre = async () => {
         try {
-            const response = await axios.get(`${process.env.REACT_APP_REST_API_URL}/movieGenre/movieNo/${movieNo}`);
+            const response = await axios.get(`${process.env.REACT_APP_REST_API_URL}/rest/movieGenre/movieNo/${movieNo}`);
             setMovieGenre(response.data);
         } catch (error) {
             console.error("에러 발생", error);
@@ -44,7 +44,7 @@ const MovieDetail = (props) => {
 
     const loadMovieMainImage = async () => {
         try {
-            const imageResponse = await axios.get(`${process.env.REACT_APP_REST_API_URL}/image/movieMain/${movieNo}`, {
+            const imageResponse = await axios.get(`${process.env.REACT_APP_REST_API_URL}/rest/image/movieMain/${movieNo}`, {
                 responseType: "arraybuffer",
             });
 
@@ -59,7 +59,7 @@ const MovieDetail = (props) => {
     // 추가 부분: 이미지 번호 리스트를 가져와서 상태에 설정
     const loadImageList = async () => {
         try {
-            const response = await axios.get(`${process.env.REACT_APP_REST_API_URL}/movie/imageNoList/${movieNo}`);
+            const response = await axios.get(`${process.env.REACT_APP_REST_API_URL}/rest/movie/imageNoList/${movieNo}`);
             setImageList(response.data);
         } catch (error) {
             console.error("이미지 번호 리스트 불러오기 오류", error);

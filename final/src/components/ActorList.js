@@ -32,7 +32,7 @@ const ActorList = (props) => {
     const loadActor = async (page = currentPage, size = pageSize) => {
         try {
             const response = await axios({
-                url: `${process.env.REACT_APP_REST_API_URL}/actor/page/${currentPage}/size/${pageSize}`,
+                url: `${process.env.REACT_APP_REST_API_URL}/rest/actor/page/${currentPage}/size/${pageSize}`,
                 method: "get",
                 params: {
                     page: currentPage,
@@ -54,7 +54,7 @@ const ActorList = (props) => {
     const loadActorImage = async (actorNo) => {
         try {
             const imageResponse = await axios({
-                url: `${process.env.REACT_APP_REST_API_URL}/image/actor/${actorNo}`,
+                url: `${process.env.REACT_APP_REST_API_URL}/rest/image/actor/${actorNo}`,
                 method: "get",
                 responseType: "arraybuffer", // 이 부분은 이미지 데이터를 바이너리 형식으로 받기 위한 설정입니다.
             });
@@ -75,7 +75,7 @@ const ActorList = (props) => {
     const loadTotalActors = async () => {
         try {
             const response = await axios({
-                url: `${process.env.REACT_APP_REST_API_URL}/actor/actorCount`,
+                url: `${process.env.REACT_APP_REST_API_URL}/rest/actor/actorCount`,
                 method: "get",
             });
             setTotalActors(response.data);
@@ -145,7 +145,7 @@ const ActorList = (props) => {
         if (choice === false) return;
 
         axios({
-            url: `${process.env.REACT_APP_REST_API_URL}/actor/${actor.actorNo}`,
+            url: `${process.env.REACT_APP_REST_API_URL}/rest/actor/${actor.actorNo}`,
             method: "delete"
         })
             .then(response => {
@@ -195,7 +195,7 @@ const ActorList = (props) => {
 
             // actor 정보와 이미지를 함께 서버로 전송
             const response = await axios.post(
-                `${process.env.REACT_APP_REST_API_URL}/actor/upload`,
+                `${process.env.REACT_APP_REST_API_URL}/rest/actor/upload`,
                 formData,
                 {
                     headers: {
@@ -259,7 +259,7 @@ const ActorList = (props) => {
         try {
             // 배우 정보를 불러오는 API 호출
             const actorResponse = await axios({
-                url: `${process.env.REACT_APP_REST_API_URL}/actor/findByActorNo/${actorNo}`,
+                url: `${process.env.REACT_APP_REST_API_URL}/rest/actor/findByActorNo/${actorNo}`,
                 method: "get",
             });
             console.log(actorResponse.data.actorNo);
@@ -273,7 +273,7 @@ const ActorList = (props) => {
 
             // 이미지 정보를 불러오는 API 호출
             const imageResponse = await axios({
-                url: `${process.env.REACT_APP_REST_API_URL}/image/actor/${actorNo}`,
+                url: `${process.env.REACT_APP_REST_API_URL}/rest/image/actor/${actorNo}`,
                 method: "get",
                 responseType: "arraybuffer",
             });
@@ -312,7 +312,7 @@ const ActorList = (props) => {
 
             // actor 정보와 이미지를 함께 서버로 전송
             const response = await axios.put(
-                `${process.env.REACT_APP_REST_API_URL}/actor/editActor/${actor.actorNo}`,
+                `${process.env.REACT_APP_REST_API_URL}/rest/actor/editActor/${actor.actorNo}`,
                 formData,
                 {
                     headers: {
@@ -337,7 +337,7 @@ const ActorList = (props) => {
                 return;
             }
             const response = await axios({
-                url: `${process.env.REACT_APP_REST_API_URL}/actor/adminSearch/${actorName}/page/${page}/size/${size}`,
+                url: `${process.env.REACT_APP_REST_API_URL}/rest/actor/adminSearch/${actorName}/page/${page}/size/${size}`,
                 method: "get",
                 params: {
                     actorName: actorName,
@@ -359,7 +359,7 @@ const ActorList = (props) => {
     const loadSearchTotalActors = async () => {
         try {
             const response = await axios({
-                url: `${process.env.REACT_APP_REST_API_URL}/actor/searchCount/${actorName}`,
+                url: `${process.env.REACT_APP_REST_API_URL}/rest/actor/searchCount/${actorName}`,
                 method: "get",
                 params: {
                     actorName: actorName

@@ -74,7 +74,7 @@ const MovieList = (props) => {
     //영화 리스트 (페이지네이션 포함)
     const loadMovie = async (page = currentPage, size = pageSize) => {
         const response = await axios({
-            url: `${process.env.REACT_APP_REST_API_URL}/movie/page/${currentPage}/size/${pageSize}`,
+            url: `${process.env.REACT_APP_REST_API_URL}/rest/movie/page/${currentPage}/size/${pageSize}`,
             method: "get",
             params: {
                 page: currentPage,
@@ -88,7 +88,7 @@ const MovieList = (props) => {
     const loadTotalMovies = async () => {
         try {
             const response = await axios({
-                url: `${process.env.REACT_APP_REST_API_URL}/movie/movieListCount`,
+                url: `${process.env.REACT_APP_REST_API_URL}/rest/movie/movieListCount`,
                 method: "get",
             });
             setTotalMovies(response.data);
@@ -217,7 +217,7 @@ const MovieList = (props) => {
         if (choice === false) return;
 
         axios({
-            url: `${process.env.REACT_APP_REST_API_URL}/movie/delete/${movie.movieNo}`,
+            url: `${process.env.REACT_APP_REST_API_URL}/rest/movie/delete/${movie.movieNo}`,
             method: "delete",
         })
             .then((response) => {
@@ -277,7 +277,7 @@ const MovieList = (props) => {
 
             // 영화 모든 것 등록
             const response = await axios.post(
-                `${process.env.REACT_APP_REST_API_URL}/movie/upload/`,
+                `${process.env.REACT_APP_REST_API_URL}/rest/movie/upload/`,
                 formData,
                 {
                     headers: {
@@ -296,7 +296,7 @@ const MovieList = (props) => {
     // 장르 불러오기
     const loadGenre = async () => {
         const response = await axios({
-            url: `${process.env.REACT_APP_REST_API_URL}/genre/`,
+            url: `${process.env.REACT_APP_REST_API_URL}/rest/genre/`,
             method: "get"
         });
         setGenreList(response.data);
@@ -397,7 +397,7 @@ const MovieList = (props) => {
         }
         try {
             const response = await axios.get(
-                `${process.env.REACT_APP_REST_API_URL}/actor/findImageNoByActorName/${actorName}`
+                `${process.env.REACT_APP_REST_API_URL}/rest/actor/findImageNoByActorName/${actorName}`
             );
             setActorImageNoList(response.data);
         } catch (error) {
@@ -447,7 +447,7 @@ const MovieList = (props) => {
         
         
         // 클릭한 이미지 번호를 이용하여 배우 번호 가져오는 axios 호출
-        axios.get(`${process.env.REACT_APP_REST_API_URL}/actor/findActorNoByImageNo/${imageNo}`)
+        axios.get(`${process.env.REACT_APP_REST_API_URL}/rest/actor/findActorNoByImageNo/${imageNo}`)
             .then((response) => {
 
                 const actorNo = response.data;
@@ -579,7 +579,7 @@ const MovieList = (props) => {
             }
 
             const response = await axios({
-                url: `${process.env.REACT_APP_REST_API_URL}/movie/adminSearch/${movieName}/page/${page}/size/${size}`,
+                url: `${process.env.REACT_APP_REST_API_URL}/rest/movie/adminSearch/${movieName}/page/${page}/size/${size}`,
                 method: "get",
                 params: {
                     movieName: movieName,
@@ -597,7 +597,7 @@ const MovieList = (props) => {
     const loadSearchTotalMovies = async () => {
         try {
             const response = await axios({
-                url: `${process.env.REACT_APP_REST_API_URL}/movie/searchCount/${movieName}`,
+                url: `${process.env.REACT_APP_REST_API_URL}/rest/movie/searchCount/${movieName}`,
                 method: "get",
                 params: {
                     movieName: movieName
