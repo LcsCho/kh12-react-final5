@@ -1,0 +1,6 @@
+@media screen and (max-width: 512px) {
+    .pc-only {
+        display: none;
+    }
+    
+}

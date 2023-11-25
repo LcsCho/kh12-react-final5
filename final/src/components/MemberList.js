@@ -1,5 +1,13 @@
 import axios from "axios";
-import { useState, useEffect } from "react";
+
+import { Modal } from "bootstrap";
+import { AiOutlinePlus, AiOutlineUnorderedList } from "react-icons/ai";
+import { LiaEdit } from "react-icons/lia";
+import { useState, useRef, useEffect } from "react";
+import { NavLink, useLocation } from "react-router-dom";
+import { MdOutlineClear } from "react-icons/md";
+import "./List.css";
+
 
 const MemberList = (props) => {
     const [memberList, setMemberList] = useState([]);
@@ -321,11 +329,12 @@ const MemberList = (props) => {
                         <tr className="table-danger">
                                 <th width="25%">아이디</th>
                                 <th width="15%">닉네임</th>
-                                <th width="15%">연락처</th>
-                                <th width="15%">생년월일</th>
-                                <th width="10%">가입일</th>
+                                <th className="pc-only" width="15%">연락처</th>
+                                <th className="pc-only" width="15%">생년월일</th>
+                                <th className="pc-only" width="10%">가입일</th>
                                 <th width="5%">성별</th>
                                 <th width="15%">등급</th>
+                                <th></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -333,15 +342,15 @@ const MemberList = (props) => {
                                 <tr key={index}>
                                     <td>{member.memberId}</td>
                                     <td>{member.memberNickname}</td>
-                                    <td>{formatPhoneNumber(member.memberContact)}</td>
-                                    <td>{member.memberBirth}</td>
-                                    <td>{member.memberJoin}</td>
+                                    <td className="pc-only">{formatPhoneNumber(member.memberContact)}</td>
+                                    <td className="pc-only">{member.memberBirth}</td>
+                                    <td className="pc-only">{member.memberJoin}</td>
                                     <td>{member.memberGender}</td>
                                     <td>
                                         <div className="row ms-2">
                                             {editableMemberId === member.memberId ? (
                                                 <div className="row mx-auto">
-                                                    <select className="form-select form-select-sm"
+                                                    <select className="form-select form-select-sm mx-auto"
                                                         value={editedMemberLevel}
                                                         onChange={handleLevelChange}
                                                     >
@@ -353,7 +362,7 @@ const MemberList = (props) => {
                                                     <button className="btn btn-secondary btn-sm mt-2" onClick={handleCancelClick}>취소</button>
                                                 </div>
                                             ) : (
-                                                <div className="row mx-auto">
+                                                <div className="row me-2">
                                                     <button className="btn btn-danger" onClick={() => handleEditClick(member.memberId, member.memberLevel)}>{member.memberLevel}
                                                     </button>
                                                 </div>

@@ -262,7 +262,7 @@ const ActorList = (props) => {
                 url: `${process.env.REACT_APP_REST_API_URL}/actor/findByActorNo/${actorNo}`,
                 method: "get",
             });
-
+            console.log(actorResponse.data.actorNo);
 
             // 비어있을 경우 처리
             if (!actorResponse.data || actorResponse.data.length === 0) {
@@ -286,6 +286,7 @@ const ActorList = (props) => {
                 actorName: actorResponse.data.actorName,
                 actorImage: null,//이미지를 set 하진 않고 미리보기만
             });
+            console.log(actor);
 
             // 불러온 이미지를 미리보기로 업데이트
             setPreviewImage(URL.createObjectURL(actorImage));
@@ -488,7 +489,7 @@ const ActorList = (props) => {
                             </tr>
                         </thead>
                         <tbody>
-                            {actorList.map((actor, index) => (
+                            {actorList.map((actor, index) =>(
                                 <tr key={index}>
                                     <td>{actor.actorName}</td>
                                     <td>
@@ -568,7 +569,12 @@ const ActorList = (props) => {
                 <div className="modal-dialog modal-lg" role="document">
                     <div className="modal-content">
                         <div className="modal-header">
-                            <h5 className="modal-title" >배우 등록</h5>
+                            <h5 className="modal-title" >
+                                {actor.actorNo ===undefined  ?
+                                '배우 등록' : `${actor.actorNo}번 배우 수정`
+                                }
+                            </h5>
+                            
                         </div>
                         <div className="modal-body">
                             <div className="row"><div className="col">
@@ -610,7 +616,7 @@ const ActorList = (props) => {
                                 <button className="btn btn-secondary" onClick={closeModal}>
                                     닫기
                                 </button>
-                                {actor.actorNo === undefined ?
+                                {actor.actorNo ===undefined ?
                                     <button className="btn btn-success" onClick={saveActor}>
                                         저장
                                     </button>
