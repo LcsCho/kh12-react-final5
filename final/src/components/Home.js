@@ -15,7 +15,7 @@ const Home = (props) => {
 
   const loadMemberCount = async () => {
     const response = await axios({
-      url: `${process.env.REACT_APP_REST_API_URL}/member/memberCount`,
+      url: `${process.env.REACT_APP_REST_API_URL}/rest/member/memberCount`,
       method: "get"
     });
     setMemberCount(response.data);
@@ -23,7 +23,7 @@ const Home = (props) => {
 
   const loadRatingCount = async () => {
     const response = await axios({
-      url: `${process.env.REACT_APP_REST_API_URL}/rating/ratingCount`,
+      url: `${process.env.REACT_APP_REST_API_URL}/rest/rating/ratingCount`,
       method: "get"
     });
     setRatingCount(response.data);
@@ -31,7 +31,7 @@ const Home = (props) => {
 
   const loadMovieCount = async () => {
     const response = await axios({
-      url: `${process.env.REACT_APP_REST_API_URL}/movie/movieCount`,
+      url: `${process.env.REACT_APP_REST_API_URL}/rest/movie/movieCount`,
       method: "get"
     });
     setMovieCount(response.data);

@@ -33,7 +33,7 @@ const MemberList = (props) => {
     //회원 리스트 (페이지네이션 포함)
     const loadMember = async (page = currentPage, size = pageSize) => {
         const response = await axios({
-            url: `${process.env.REACT_APP_REST_API_URL}/member/page/${currentPage}/size/${pageSize}`,
+            url: `${process.env.REACT_APP_REST_API_URL}/rest/member/page/${currentPage}/size/${pageSize}`,
             method: "get",
             params: {
                 page: currentPage,
@@ -47,7 +47,7 @@ const MemberList = (props) => {
     const loadTotalMembers = async () => {
         try {
             const response = await axios({
-                url: `${process.env.REACT_APP_REST_API_URL}/member/memberCount`,
+                url: `${process.env.REACT_APP_REST_API_URL}/rest/member/memberCount`,
                 method: "get",
             });
             setTotalMembers(response.data);
@@ -112,7 +112,7 @@ const MemberList = (props) => {
             }
 
             const response = await axios({
-                url: `${process.env.REACT_APP_REST_API_URL}/member/adminSearch/${memberNickname}/page/${page}/size/${size}`,
+                url: `${process.env.REACT_APP_REST_API_URL}/rest/member/adminSearch/${memberNickname}/page/${page}/size/${size}`,
                 method: "get",
                 params: {
                     memberNickname: memberNickname,
@@ -130,7 +130,7 @@ const MemberList = (props) => {
     const loadSearchTotalMembers = async () => {
         try {
             const response = await axios({
-                url: `${process.env.REACT_APP_REST_API_URL}/member/searchCount/${memberNickname}`,
+                url: `${process.env.REACT_APP_REST_API_URL}/rest/member/searchCount/${memberNickname}`,
                 method: "get",
                 params: {
                     memberNickname: memberNickname
@@ -234,7 +234,7 @@ const MemberList = (props) => {
     const updateMember = async (memberId) => {
         try {
             await axios({
-                url: `${process.env.REACT_APP_REST_API_URL}/member/${memberId}`,
+                url: `${process.env.REACT_APP_REST_API_URL}/rest/member/${memberId}`,
                 method: "patch",
                 data: {
                     memberLevel: editedMemberLevel,
@@ -273,37 +273,6 @@ const MemberList = (props) => {
     const formatPhoneNumber = (phoneNumber) => {
         return phoneNumber.replace(/(\d{3})(\d{4})(\d{4})/, '$1-$2-$3');
     };
-
-    const calculatePageRange = (currentPage, maxButtons, totalPages) => {
-        const halfMaxButtons = Math.floor(maxButtons / 2);
-        let startPage = Math.max(1, currentPage - halfMaxButtons);
-        let endPage = Math.min(totalPages, startPage + maxButtons - 1);
-    
-        if (endPage - startPage + 1 < maxButtons) {
-            startPage = Math.max(1, endPage - maxButtons + 1);
-        }
-    
-        return { startPage, endPage };
-    };
-
-    const renderRangeButtons = (currentPage, maxButtons, totalPages, handlePageChange) => {
-        const buttons = [];
-        const { startPage, endPage } = calculatePageRange(currentPage, maxButtons, totalPages);
-    
-        for (let i = startPage; i <= endPage; i++) {
-            buttons.push(
-                <li key={i} className={`page-item ${currentPage === i ? "active" : ""}`}>
-                    <button type="button" className="page-link" onClick={() => handlePageChange(i)}>
-                        {i}
-                    </button>
-                </li>
-            );
-        }
-    
-        return buttons;
-    };
-    
-    
 
     return (
         <>

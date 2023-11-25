@@ -16,7 +16,7 @@ const ReviewList = (props) => {
 
     // const loadReview = async (page = currentPage, size = pageSize) => {
     //     try {
-    //         const response = await axios.get(`${process.env.REACT_APP_REST_API_URL}/review/adminReviewList`);
+    //         const response = await axios.get(`${process.env.REACT_APP_REST_API_URL}/rest/review/adminReviewList`);
     //         setReviewList(response.data);
     //     } catch (error) {
     //         console.error("에러 발생", error);
@@ -26,7 +26,7 @@ const ReviewList = (props) => {
     //전체 리뷰 리스트
     const loadReview = async (page = currentPage, size = pageSize) => {
         const response = await axios({
-            url: `${process.env.REACT_APP_REST_API_URL}/review/page/${currentPage}/size/${pageSize}`,
+            url: `${process.env.REACT_APP_REST_API_URL}/rest/review/page/${currentPage}/size/${pageSize}`,
             method: "get",
             params: {
                 page: currentPage,
@@ -40,7 +40,7 @@ const ReviewList = (props) => {
     const loadTotalReviews = async () => {
         try {
             const response = await axios({
-                url: `${process.env.REACT_APP_REST_API_URL}/review/reviewCount`,
+                url: `${process.env.REACT_APP_REST_API_URL}/rest/review/reviewCount`,
                 method: "get",
             });
             setTotalReviews(response.data);
