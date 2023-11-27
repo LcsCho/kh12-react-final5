@@ -689,6 +689,7 @@ const MovieList = (props) => {
                     onChange={handleSearchInputChange}
                     onKeyPress={handleSearchInputKeyPress}
                     className="form-control me-2"
+                    autoComplete="off"
                     style={{ width: '400px' }}
                 />
                 <button className="btn btn-danger h-100" onClick={handleSearchButtonClick} style={{ lineHeight: "2" }}>
@@ -799,6 +800,7 @@ const MovieList = (props) => {
                                 <input type="text" name="movieName" className="form-control"
                                     value={movie.movieName}
                                     onChange={changeMovie}
+                                    autoComplete="off"
                                 />
                             </div></div>
 
@@ -831,6 +833,7 @@ const MovieList = (props) => {
                                 <input type="date" name="movieReleaseDate" className="form-control"
                                     value={movie.movieReleaseDate}
                                     onChange={changeMovie}
+                                    autoComplete="off"
                                 />
                             </div></div>
 
@@ -847,17 +850,23 @@ const MovieList = (props) => {
 
                             <div className="row mt-4"><div className="col">
                                 <label className="form-label" >감독</label>
-                                <input type="text" name="movieDirector" className="form-control" value={movie.movieDirector} onChange={changeMovie} />
+                                <input type="text" name="movieDirector" className="form-control" 
+                                value={movie.movieDirector} onChange={changeMovie} 
+                                autoComplete="off"/>
                             </div></div>
 
                             <div className="row mt-4"><div className="col">
                                 <label className="form-label" >상영시간</label>
-                                <input type="number" name="movieTime" className="form-control" value={movie.movieTime} onChange={changeMovie} />
+                                <input type="number" name="movieTime" className="form-control" 
+                                value={movie.movieTime} onChange={changeMovie} 
+                                autoComplete="off"/>
                             </div></div>
 
                             <div className="row mt-4"><div className="col">
                                 <label className="form-label" >제작국가</label>
-                                <input type="text" name="movieNation" className="form-control" value={movie.movieNation} onChange={changeMovie} />
+                                <input type="text" name="movieNation" className="form-control" 
+                                value={movie.movieNation} onChange={changeMovie} 
+                                autoComplete="off"/>
                             </div></div>
 
                             {/* 장르 등록 */}
@@ -900,7 +909,9 @@ const MovieList = (props) => {
 
                             <div className="row mt-4"><div className="col">
                                 <label className="form-label">줄거리</label>
-                                <textarea name="movieContent" className="form-control" value={movie.movieContent} onChange={changeMovie} />
+                                <textarea name="movieContent" className="form-control" 
+                                value={movie.movieContent} onChange={changeMovie} 
+                                autoComplete="off"/>
                             </div></div>
 
                             {/* {actorImageNoList.map((imageNo) => (
@@ -916,8 +927,7 @@ const MovieList = (props) => {
                                         {/* 이미지를 렌더링하는 코드 수정 */}
                                         {imageNo}
                                         <img
-                                            
-                                            src={`${process.env.REACT_APP_REST_API_URL}/image/${imageNo}`}
+                                            src={`${process.env.REACT_APP_REST_API_URL}/rest/image/${imageNo}`}
                                             alt={`이미지 ${imageNo}`}
                                             className="img-fluid"
                                             style={{ width: '100px', height: '100px' }}
@@ -941,6 +951,7 @@ const MovieList = (props) => {
                                                         value={actorList[index] || ''}
                                                         onChange={(e) => handleActorChange(e, type, index)}                                                                                                              
                                                         className="form-control"
+                                                        autoComplete="off"
                                                     // ref={fileChooser}
                                                     />
                                                     <button
@@ -974,12 +985,14 @@ const MovieList = (props) => {
                                                 name="movieImageList"
                                                 className="form-control"
                                                 ref={fileChoosers}
+                                                autoComplete="off"
                                                 onChange={(e) => handleGalleryImageChange(e, index)}
                                             /> :
                                             <input
                                                 type="file"
                                                 name="movieImageList"
                                                 className="form-control"
+                                                autoComplete="off"
                                                 onChange={(e) => handleGalleryImageChange(e, index)}
                                             />
                                         }
