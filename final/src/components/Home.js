@@ -6,12 +6,16 @@ import { Modal } from "bootstrap";
 import { FcConferenceCall } from "react-icons/fc";
 import { FcFilmReel } from "react-icons/fc";
 import { IoIosStar } from "react-icons/io";
+import { FcBusinessman } from "react-icons/fc";
+import { TiHome } from "react-icons/ti";
 
 const Home = (props) => {
 
   const [memberCount, setMemberCount] = useState([]);
   const [ratingCount, setRatingCount] = useState([]);
   const [movieCount, setMovieCount] = useState([]);
+  const [actorCount, setActorCount] = useState([]);
+
 
   const loadMemberCount = async () => {
     const response = await axios({
@@ -37,10 +41,19 @@ const Home = (props) => {
     setMovieCount(response.data);
   };
 
+  const loadActorCount = async () => {
+    const response = await axios({
+      url: `${process.env.REACT_APP_REST_API_URL}/rest/actor/actorCount`,
+      method: "get"
+    });
+    setActorCount(response.data);
+  }
+
   useEffect(() => {
     loadMemberCount();
     loadRatingCount();
     loadMovieCount();
+    loadActorCount();
   }, []);
 
 
@@ -79,9 +92,13 @@ const Home = (props) => {
     <div style={{ marginTop: '100px', marginBottom: '100px' }}>
       <div className="col-md-10 offset-md-1 col-sm-10 offset-sm-1 mt-5">
         <div style={{ border: '2px solid #B33939', borderRadius: '5px', marginTop: '20px', marginBottom: '20px', width: "100%", height: "400px" }} className="p-4">
-          <h1>관리자</h1>
-          <NavLink to="http://localhost:8080/" style={{ textDecoration: 'none', color: '#000' }}><h1>메인으로 이동</h1>
-          </NavLink>
+          <h1 style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span>관리자</span>
+            <NavLink to="http://localhost:8080/" style={{ textDecoration: 'none', color: '#000' }}>
+              <TiHome />
+            </NavLink>
+          </h1>
+
           <hr />
           <div className="row text-center">
             <div className="col-md-3">
@@ -99,20 +116,26 @@ const Home = (props) => {
           </div>
           <hr />
           <div className="row text-center">
-            <div className="col-md-4">
+            <div className="col-md-3">
               <p className="mt-2">
-                <FcConferenceCall style={{maxWidth: "110px", maxHeight: "120px"}}/> 회원 수</p>
-              <span>{memberCount}</span>
+                <FcBusinessman style={{ maxWidth: "110px", maxHeight: "120px" }} />
+                배우 수</p>
+              <span>{actorCount}</span>
             </div>
-            <div className="col-md-4">
+            <div className="col-md-3">
               <p className="mt-2">
-                <FcFilmReel style={{maxWidth: "110px", maxHeight: "120px"}}/>
+                <FcFilmReel style={{ maxWidth: "110px", maxHeight: "120px" }} />
                 영화 수</p>
               <span>{movieCount}</span>
             </div>
-            <div className="col-md-4">
+            <div className="col-md-3">
               <p className="mt-2">
-              <IoIosStar style={{maxWidth: "110px", maxHeight: "120px", color:"gold"}}/>
+                <FcConferenceCall style={{ maxWidth: "110px", maxHeight: "120px" }} /> 회원 수</p>
+              <span>{memberCount}</span>
+            </div>
+            <div className="col-md-3">
+              <p className="mt-2">
+                <IoIosStar style={{ maxWidth: "110px", maxHeight: "120px", color: "gold" }} />
                 평점 수</p>
               <span>{ratingCount}</span>
             </div>
