@@ -113,7 +113,7 @@ const MovieDetail = (props) => {
                 movie && (
                     <>
                         {/* <h1 className="text-center" style={{ color: '#B33939', fontSize: '40px', fontWeight: 'bold' }}>{movie.movieName}({movieNo})</h1> */}
-                        <div className="col-md-4">
+                        <div className="col-md-4 mb-3">
                             <IconNavLink icon={<AiOutlineUnorderedList style={iconStyle} />} to="/movieList" label="뒤로 가기" />
                         </div>
                         <div className="col text-center">
@@ -121,7 +121,7 @@ const MovieDetail = (props) => {
                             <table className="table">
                                 <tbody>
                                     <tr>
-                                        <th>제목(번호)</th>
+                                        <th style={{ width: '100px'}}>제목(번호)</th>
                                         <td><h1 className="text-center" style={{ color: '#B33939', fontSize: '40px', fontWeight: 'bold' }}>{movie.movieName}({movieNo})</h1></td>
                                     </tr>
                                     <tr>
