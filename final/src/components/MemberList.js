@@ -286,6 +286,7 @@ const MemberList = (props) => {
                     onKeyPress={handleSearchInputKeyPress}
                     className="form-control me-2"
                     style={{ width: '400px' }}
+                    autoComplete="off"
                 />
                 <button className="btn btn-danger h-100" onClick={handleSearchButtonClick} style={{ lineHeight: "2" }}>
                     검색
