@@ -497,10 +497,10 @@ const ActorList = (props) => {
                                             <img
                                                 src={actor.imageUrl}
                                                 alt={`이미지-${actor.actorNo}`}
-                                                style={{ maxWidth: "100px", maxHeight: "100px" }}
+                                                style={{width: '100px', height: '100px' }}
                                             />
                                         ) : (
-                                            <FaUser style={{ maxWidth: "100px", maxHeight: "100px", marginTop: "12px" }} />
+                                            <FaUser style={{width: '100px', height: '100px', marginTop: "12px" }} />
                                         )}
                                     </td>
                                     <td>
