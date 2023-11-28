@@ -708,8 +708,8 @@ const MovieList = (props) => {
                     <table className="table table-hover">
                         <thead>
                             <tr className="table-danger">
-                                <th width="5%">번호</th>
-                                <th width="25%">제목</th>
+                                {/* <th width="5%">번호</th> */}
+                                <th width="30%">제목</th>
                                 <th width="10%">감독</th>
                                 <th width="10%">개봉일</th>
                                 <th width="25%">장르</th>
@@ -721,7 +721,7 @@ const MovieList = (props) => {
                         <tbody>
                             {movieList.map((movie, index) => (
                                 <tr>
-                                    <td>{movie.movieNo}</td>
+                                    {/* <td>{movie.movieNo}</td> */}
                                     <td>
                                         <div className="row">
                                             <NavLink
