@@ -201,7 +201,7 @@ const MovieDetail = (props) => {
                                                         key={imageNo}
                                                         src={`${process.env.REACT_APP_REST_API_URL}/rest/image/${imageNo}`}
                                                         alt={`이미지-${imageNo}`}
-                                                        style={{ maxWidth: "150px", maxHeight: "150px", margin: "5px" }}
+                                                        style={{ width: "200px", height: "200px", margin: "5px" }}
                                                     />
                                                 ))}
                                             </div>
