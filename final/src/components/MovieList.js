@@ -335,7 +335,7 @@ const MovieList = (props) => {
         modal.hide();
         clearMovie();
         setActorImageNoList([]);
-        
+
     };
 
     // 장르 세팅
@@ -409,7 +409,7 @@ const MovieList = (props) => {
 
 
     // 배우 입력 값 변경 함수
-    const handleActorChange = async(e, type, index) => {
+    const handleActorChange = async (e, type, index) => {
 
         const actorName = e.target.value;
         // 값이 비어있을 때 이미지를 안 보이도록
@@ -427,7 +427,7 @@ const MovieList = (props) => {
             setActorImageNoList([]);
             return;
         }
-        setActors(prev=>({
+        setActors(prev => ({
             ...prev,
             [type]: prev[type].map((t, i) => {
                 if (i === index) {
@@ -444,8 +444,8 @@ const MovieList = (props) => {
 
         // setClickedActorInfo를 통해 저장한 type과 index 가져오기
         const { type, index } = clickedActorInfo;
-        
-        
+
+
         // 클릭한 이미지 번호를 이용하여 배우 번호 가져오는 axios 호출
         axios.get(`${process.env.REACT_APP_REST_API_URL}/rest/actor/findActorNoByImageNo/${imageNo}`)
             .then((response) => {
@@ -709,11 +709,11 @@ const MovieList = (props) => {
                         <thead>
                             <tr className="table-danger">
                                 {/* <th width="5%">번호</th> */}
-                                <th width="30%">제목</th>
+                                <th width="27%">제목</th>
                                 <th width="10%">감독</th>
                                 <th width="10%">개봉일</th>
                                 <th width="25%">장르</th>
-                                <th width="5%">국가</th>
+                                <th width="8%">국가</th>
                                 <th width="15%">출연진</th>
                                 <th width="5%">관리</th>
                             </tr>
@@ -850,23 +850,23 @@ const MovieList = (props) => {
 
                             <div className="row mt-4"><div className="col">
                                 <label className="form-label" >감독</label>
-                                <input type="text" name="movieDirector" className="form-control" 
-                                value={movie.movieDirector} onChange={changeMovie} 
-                                autoComplete="off"/>
+                                <input type="text" name="movieDirector" className="form-control"
+                                    value={movie.movieDirector} onChange={changeMovie}
+                                    autoComplete="off" />
                             </div></div>
 
                             <div className="row mt-4"><div className="col">
                                 <label className="form-label" >상영시간</label>
-                                <input type="number" name="movieTime" className="form-control" 
-                                value={movie.movieTime} onChange={changeMovie} 
-                                autoComplete="off"/>
+                                <input type="number" name="movieTime" className="form-control"
+                                    value={movie.movieTime} onChange={changeMovie}
+                                    autoComplete="off" />
                             </div></div>
 
                             <div className="row mt-4"><div className="col">
                                 <label className="form-label" >제작국가</label>
-                                <input type="text" name="movieNation" className="form-control" 
-                                value={movie.movieNation} onChange={changeMovie} 
-                                autoComplete="off"/>
+                                <input type="text" name="movieNation" className="form-control"
+                                    value={movie.movieNation} onChange={changeMovie}
+                                    autoComplete="off" />
                             </div></div>
 
                             {/* 장르 등록 */}
@@ -909,9 +909,9 @@ const MovieList = (props) => {
 
                             <div className="row mt-4"><div className="col">
                                 <label className="form-label">줄거리</label>
-                                <textarea name="movieContent" className="form-control" 
-                                value={movie.movieContent} onChange={changeMovie} 
-                                autoComplete="off"/>
+                                <textarea name="movieContent" className="form-control"
+                                    value={movie.movieContent} onChange={changeMovie}
+                                    autoComplete="off" />
                             </div></div>
 
                             {/* {actorImageNoList.map((imageNo) => (
@@ -919,26 +919,28 @@ const MovieList = (props) => {
                                         {imageNo}
                                     </div>
                             ))} */}
-                            
-                            <div style={{ display: 'flex', flexDirection: 'row' }}>
-                                {actorImageNoList.slice(0,5).map((imageNo) => (
+
+                            <div className="mt-2" style={{ display: 'flex', flexDirection: 'row' }}>
+                                {actorImageNoList.slice(0, 5).map((imageNo) => (
                                     <div key={imageNo} style={{ marginRight: '10px' }}>
-                                        
-                                        {/* 이미지를 렌더링하는 코드 수정 */}
-                                        {imageNo}
-                                        <img
-                                            src={`${process.env.REACT_APP_REST_API_URL}/rest/image/${imageNo}`}
-                                            alt={`이미지 ${imageNo}`}
-                                            className="img-fluid"
-                                            style={{ width: '100px', height: '100px' }}
-                                            onClick={() => handleImageClick(imageNo)}
-                                        />
+                                        <div className="card bg-light  text-content" >
+                                            <div className="card-header p-1 text-center">{imageNo}</div>
+                                            <div className="card-body p-1">
+                                                <p className="card-text"><img
+                                                    src={`${process.env.REACT_APP_REST_API_URL}/rest/image/${imageNo}`}
+                                                    alt={`이미지 ${imageNo}`}
+                                                    className="img-fluid"
+                                                    style={{ width: '100px', height: '100px' }}
+                                                    onClick={() => handleImageClick(imageNo)}
+                                                /></p>
+                                            </div>
+                                        </div>
                                     </div>
                                 ))}
                             </div>
 
                             {/* 배우 번호로 등록 */}
-                            <div className="row mt-4">
+                            <div className="row mt-2">
                                 {Object.entries(actors).map(([type, actorList]) => (
                                     <div key={type} className="col">
                                         <label className="form-label" name="actorRoleList" value={movie.actorRoleList}>{type}</label>
@@ -949,7 +951,7 @@ const MovieList = (props) => {
                                                         type="text"
                                                         name="actorNoList"
                                                         value={actorList[index] || ''}
-                                                        onChange={(e) => handleActorChange(e, type, index)}                                                                                                              
+                                                        onChange={(e) => handleActorChange(e, type, index)}
                                                         className="form-control"
                                                         autoComplete="off"
                                                     // ref={fileChooser}
