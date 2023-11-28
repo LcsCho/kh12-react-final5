@@ -89,7 +89,7 @@ const Home = (props) => {
 
 
   return (
-    <div style={{ marginTop: '100px', marginBottom: '100px' }}>
+    <div className="container overflow-hidden" style={{ marginTop: '100px', marginBottom: '100px' }}>
       <div className="col-md-10 offset-md-1 col-sm-10 offset-sm-1 mt-5">
         <div style={{ border: '2px solid #B33939', borderRadius: '5px', marginTop: '20px', marginBottom: '20px', width: "100%", height: "400px" }} className="p-4">
           <h1 style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -116,24 +116,24 @@ const Home = (props) => {
           </div>
           <hr />
           <div className="row text-center">
-            <div className="col-md-3">
+            <div className="col-md-3 col-6">
               <p className="mt-2">
                 <FcBusinessman style={{ maxWidth: "110px", maxHeight: "120px" }} />
                 배우 수</p>
               <span>{actorCount}</span>
             </div>
-            <div className="col-md-3">
+            <div className="col-md-3 col-6">
               <p className="mt-2">
                 <FcFilmReel style={{ maxWidth: "110px", maxHeight: "120px" }} />
                 영화 수</p>
               <span>{movieCount}</span>
             </div>
-            <div className="col-md-3">
+            <div className="col-md-3 col-6">
               <p className="mt-2">
                 <FcConferenceCall style={{ maxWidth: "110px", maxHeight: "120px" }} /> 회원 수</p>
               <span>{memberCount}</span>
             </div>
-            <div className="col-md-3">
+            <div className="col-md-3 col-6">
               <p className="mt-2">
                 <IoIosStar style={{ maxWidth: "110px", maxHeight: "120px", color: "gold" }} />
                 평점 수</p>
