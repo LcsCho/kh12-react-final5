@@ -116,24 +116,24 @@ const Home = (props) => {
           </div>
           <hr />
           <div className="row text-center">
-            <div className="col-md-3">
+            <div className="col-md-3 col-6">
               <p className="mt-2">
                 <FcBusinessman style={{ maxWidth: "110px", maxHeight: "120px" }} />
                 배우 수</p>
               <span>{actorCount}</span>
             </div>
-            <div className="col-md-3">
+            <div className="col-md-3 col-6">
               <p className="mt-2">
                 <FcFilmReel style={{ maxWidth: "110px", maxHeight: "120px" }} />
                 영화 수</p>
               <span>{movieCount}</span>
             </div>
-            <div className="col-md-3">
+            <div className="col-md-3 col-6">
               <p className="mt-2">
                 <FcConferenceCall style={{ maxWidth: "110px", maxHeight: "120px" }} /> 회원 수</p>
               <span>{memberCount}</span>
-            </div>1
-            <div className="col-md-3">
+            </div>
+            <div className="col-md-3 col-6">
               <p className="mt-2">
                 <IoIosStar style={{ maxWidth: "110px", maxHeight: "120px", color: "gold" }} />
                 평점 수</p>
