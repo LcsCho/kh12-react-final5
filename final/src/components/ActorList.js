@@ -601,6 +601,7 @@ const ActorList = (props) => {
                                             <img
                                                 src={previewImage}
                                                 alt="미리보기"
+                                                style={{width: '200px', height: '200px' }}
                                                 className="img-fluid"
                                             />
                                         </div>
