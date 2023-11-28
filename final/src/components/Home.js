@@ -89,7 +89,7 @@ const Home = (props) => {
 
 
   return (
-    <div style={{ marginTop: '100px', marginBottom: '100px' }}>
+    <div className="container overflow-hidden" style={{ marginTop: '100px', marginBottom: '100px' }}>
       <div className="col-md-10 offset-md-1 col-sm-10 offset-sm-1 mt-5">
         <div style={{ border: '2px solid #B33939', borderRadius: '5px', marginTop: '20px', marginBottom: '20px', width: "100%", height: "400px" }} className="p-4">
           <h1 style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
