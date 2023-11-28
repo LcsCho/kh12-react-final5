@@ -100,7 +100,7 @@ const ReviewList = (props) => {
         if (choice === false) return;
 
         axios({
-            url: `${process.env.REACT_APP_REST_API_URL}/review/${review.reviewNo}`,
+            url: `${process.env.REACT_APP_REST_API_URL}/rest/review/${review.reviewNo}`,
             method: "delete"
         })
             .then(response => {
