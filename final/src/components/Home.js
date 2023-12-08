@@ -94,9 +94,9 @@ const Home = (props) => {
         <div style={{ border: '2px solid #B33939', borderRadius: '5px', marginTop: '20px', marginBottom: '20px', width: "100%", height: "400px" }} className="p-4">
           <h1 style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <span>관리자</span>
-            <NavLink to="http://localhost:8080/" style={{ textDecoration: 'none', color: '#000' }}>
+            <a href={`${process.env.REACT_APP_REST_API_URL}/`}>
               <TiHome />
-            </NavLink>
+            </a>
           </h1>
 
           <hr />
