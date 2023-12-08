@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
-import mvcImage from '../assets/images/mvc.png';
+
 
 const Menu = (props) => {
     const location = useLocation();
@@ -37,7 +37,7 @@ const Menu = (props) => {
             <nav className="navbar navbar-expand-lg bg-body-white fixed-top">
                 <div className="container-fluid">
                     <NavLink className="navbar-brand" to="/">
-                        <img src={mvcImage} width={widthSize} height={heightSize} alt="Logo" />
+                        <h1>to Main</h1>
                     </NavLink>
                 </div>
             </nav>
